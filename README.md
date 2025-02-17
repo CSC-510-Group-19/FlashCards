@@ -71,53 +71,37 @@ FlashCards is a spaced repetition learning platform to <b>create</b>, <b>memoriz
   <img src="./images/leaderboard.png" alt="Demo Screens 7" width="250px" height="250px style="object-fit: cover;" />
 </p>
 
+<!-- ## Future Roadmap [See here](https://github.com/users/JohnDamilola/projects/1) -->
 
-
-## Future Roadmap [See here](https://github.com/users/JohnDamilola/projects/1)
 ### Phase 1:
-- [x] Create database ER diagram
-- [x] User Login
-- [x] User Signup/Create Account
-- [x] Explore or Search Public FlashCards
-- [x] Create/Read/Update/Delete <b>Decks</b> <i>(collections of cards)</i>
-- [x] Create/Read/Update/Delete <b>Cards</b>
-- [x] FlashCard Practice Mode
-- [x] Add Unit testing
-- [x] Setup backend and frontend deployment
-
-### Phase 2:
-- [x] Add slider to navigate through the decks
-- [x] Folder Creation
-- [x] Add decks to the folders, and redirect them to the Practice Deck on click
-- [x] Quiz mode 
-- [x] Show recently visited decks on dashboard
-- [x] Leaderboard that shows the email, count of correct and incorrect answers, and rank of a particular user.
-
-### Phase 3:
 - [ ] Add a dashboard providing insights on study habits, quiz results over time, and areas needing improvement, helping users to plan their study strategy.
 - [ ] Enable collaborative learning by enabling users to share flashcards seamlessly with friends, classmates, or study groups
 - [ ] Progress tracking by subject and review options like retrying incorrect questions
 - [ ] Chrome Extension feature that enables users to highlight text on websites or online PDFs and instantly create flashcards from their selections.
 
 ## Contributions to the Project
-Please refer to the [Contributing.md](https://github.com/JohnDamilola/FlashCards/blob/main/Contributing.md) if you want to contrbute to the FlashCards source code. Follow all the guidelines mentioned and raise a pull request for the developers to review before the code goes to the main source code.
+Please refer to the [Contributing.md](https://github.com/Group21-SWE/FlashCards/blob/main/Contributing.md) if you want to contrbute to the FlashCards source code. Follow all the guidelines mentioned and raise a pull request for the developers to review before the code goes to the main source code.
 
 ## Help
 
 Email any queries to the contributors -
-1. [Akhil Chawla](achawla@ncsu.edu)
-2. [Sanjana Dalal](sdalal2@ncsu.edu)
-3. [Priya Gandhi](pgandi4@ncsu.edu)
+1. [Haven Brown](hbrown4@ncsu.edu)
+2. [Trent Wiens](twiens@ncsu.edu)
+3. [Abhinav Sharma](asharm67@ncsu.edu)
 
 ## Authors 
 
-1. [Akhil Chawla](https://github.com/AkhilChawla)
-2. [Sanjana Dalal](https://github.com/sdalal11)
-3. [Priya Gandhi](https://github.com/PriyaGandhi311)
+1. [Haven Brown](https://github.com/havenbrown1108)
+2. [Trent Wiens](https://github.com/Trent-Wiens)
+3. [Abhinav Sharma](https://github.com/ABHINAVSHARMA8)
 
 
 ## License
-[MIT](https://tldrlegal.com/license/mit-license)
+[MIT](https://github.com/Group21-SWE/FlashCards/blob/main/LICENSE)
+
+## References
+It was recommended we clone the original repo for this project rather than fork it. To view the repository
+this project started with go see: [SE-Fall24-RZA](https://github.com/SE-Fall24-RZA/FlashCards/tree/main).
 
 ## Funding
 Our project at the moment is not funded by any organization/individual.
