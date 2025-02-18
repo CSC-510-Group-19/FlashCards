@@ -11,6 +11,12 @@ npm install
 npm start
 ```
 
+You may need to install more dependencies for npm to work:
+```
+npm install --legacy-peer-deps
+npm install react-card-flip@latest
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
