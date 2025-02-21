@@ -21,12 +21,57 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+import { isLabelWithInternallyDisabledControl } from "@testing-library/user-event/dist/utils";
 import { message } from "antd";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import http from 'utils/api';
 import "./styles.scss";
+
+const openDB = (dbName: string, storeName: string, version = 1): Promise<IDBDatabase> => {
+  return new Promise((resolve, reject) => {
+      const request = indexedDB.open(dbName, version);
+
+      request.onupgradeneeded = (event) => {
+          const db = (event.target as IDBOpenDBRequest).result;
+          if (!db.objectStoreNames.contains(storeName)) {
+              db.createObjectStore(storeName, { keyPath: 'id', autoIncrement: true });
+          }
+      };
+
+      request.onsuccess = (event: Event) => {
+        const db = (event.target as IDBOpenDBRequest).result; // Cast to IDBOpenDBRequest
+        if (db) {
+            resolve(db);
+        } else {
+            reject('Failed to open database: event.target is null');
+        }
+    };
+
+    request.onerror = (event: Event) => {
+        reject(`Error opening database: ${(event.target as IDBRequest).error?.message || 'Unknown error'}`);
+    };
+  });
+};
+
+async function writeLocalIdToIndexDB(data: JSON) {
+    const db = await openDB("FlashcardsDB", "Flashcards");
+    const transaction = db.transaction("Flashcards", 'readwrite');
+    const store = transaction.objectStore("Flashcards");
+
+    return new Promise((resolve, reject) => {
+        const request = store.add(data);
+
+        request.onsuccess = () => {
+            resolve('Data written to IndexedDB');
+        };
+
+        request.onerror = (event) => {
+            reject(`Error writing to IndexedDB: ${(event.target as IDBRequest).error?.message || 'Unknown error'}`);
+        };
+    });
+}
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -46,6 +91,8 @@ const Login = () => {
       .then((res) => {
         const { user } = res.data || {};
         window.localStorage.setItem('flashCardUser', JSON.stringify(user));
+        const request = window.indexedDB.open("Flashcard", 3);
+        writeLocalIdToIndexDB(user);
         Swal.fire({
           icon: 'success',
           title: 'Login Successful!',
