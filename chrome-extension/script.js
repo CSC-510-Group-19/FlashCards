@@ -1,5 +1,5 @@
-var localId = ''
-const readFromIndexedDB = async (dbName, storeName) => {
+var localId = 'Hello1'
+/*const readFromIndexedDB = async (dbName, storeName) => {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open("FlashcardsDB");
   
@@ -22,7 +22,16 @@ const readFromIndexedDB = async (dbName, storeName) => {
         reject('Error opening IndexedDB');
       };
     });
-  };
+  }; */
+/* window.addEventListener('message', (event) => {
+    // Ensure the message is from a trusted source
+    if (event.data.type === 'TO_EXTENSION') {
+      const { type, payload } = event.data;
+  
+      // Relay the message to the background script
+      localId = payload;
+    }
+});*/
 async function invokeAPI() {
     /* if (!localId) {
         console.error('localId is not set');

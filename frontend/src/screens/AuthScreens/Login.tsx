@@ -21,11 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 import { isLabelWithInternallyDisabledControl } from "@testing-library/user-event/dist/utils";
 import { message } from "antd";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import { createWatchCompilerHost } from "typescript";
 import http from 'utils/api';
 import "./styles.scss";
 
@@ -73,6 +75,25 @@ async function writeLocalIdToIndexDB(data: JSON) {
     });
 }
 
+/*async function storeDataIChromeStorage() {
+  chrome.runtime.sendMessage(extensionId, {
+    type: 'SEND_DATA',
+    payload: data
+  }, (response) => {
+    if (response?.success) {
+      console.log('Data sent successfully');
+      document.getElementById('output').textContent = 'Data sent successfully!';
+    } else {
+      console.error('Failed to send data');
+    }
+  });*/
+function sendDataToExtension(data: string) {
+  console.log('Sending message')
+  //window.postMessage({ type: 'TO_EXTENSION', payload: { type: 'SEND_DATA', payload: data } }, '*');
+  window.postMessage("Hello", 'chrome://extensions:bhobgoanochflfeakgbeaoijpgajelee');
+  console.log("Message sent")
+}
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -90,9 +111,15 @@ const Login = () => {
       .post("/login", payload)
       .then((res) => {
         const { user } = res.data || {};
+        console.log('Sending (Line 113)');
+        sendDataToExtension(JSON.stringify(user));
+        console.log('Sending (Line 114)');
         window.localStorage.setItem('flashCardUser', JSON.stringify(user));
-        const request = window.indexedDB.open("Flashcard", 3);
-        writeLocalIdToIndexDB(user);
+        //storeDataIChromeStorage()
+        // sendDataToExtension(JSON.parse(user));
+        // chrome.storage.local.set({"flashCardUser" : JSON.stringify(user) }).then(() => console.log("Done")/*placeholder statement*/ );
+        //const request = window.indexedDB.open("Flashcard", 3);
+        //writeLocalIdToIndexDB(user);
         Swal.fire({
           icon: 'success',
           title: 'Login Successful!',
@@ -101,6 +128,7 @@ const Login = () => {
         }).then(() => {
           setIsSubmitting(false);
           window.location.replace("/dashboard");
+          
         });
       })
       .catch((err) => {
