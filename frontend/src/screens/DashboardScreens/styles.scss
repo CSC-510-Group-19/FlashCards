@@ -179,6 +179,37 @@
     }
 }
 
+.goal-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  
+    h2 {
+      margin-bottom: 10px;
+    }
+  
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+  
+    button {
+      background-color: #007bff;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+  
+      &:disabled {
+        background-color: #ccc;
+        cursor: default;
+      }
+    }
+  }
 .create-deck-page {
 
     // background: #221daf;
