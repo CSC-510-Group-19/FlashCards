@@ -89,6 +89,11 @@ const Dashboard = () => {
         .sort((a: { lastOpened: string | number | Date; }, b: { lastOpened: string | number | Date; }) => new Date(b.lastOpened!).getTime() - new Date(a.lastOpened!).getTime());
 
       setRecentDecks(recent);
+
+      if (recent.length > 0) {
+        updateStreak(recent[0].lastOpened);
+      }
+
     } catch (err) {
       console.error("Error fetching decks:", err);
       setDecks([]);
@@ -177,6 +182,22 @@ const Dashboard = () => {
       sliderRefRecent.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
+
+  const updateStreak = async (lastOpened: string) => {
+    if (!localId) return; 
+
+    const today = new Date().toDateString();
+    const lastStudyDate = new Date(lastOpened).toDateString();
+    
+    if (lastStudyDate !== today) {
+      try {
+        await http.patch('/user/${localId}/update-streak', {lastStudyDate: today});
+      } catch (err) {
+        console.error("Error updating streak: ", err)
+      }
+    }
+
+  }
 
   return (
     <div className="dashboard-page dashboard-commons">
