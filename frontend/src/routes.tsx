@@ -8,7 +8,7 @@ import PracticeDeck from 'screens/DashboardScreens/PracticeDeck'
 import EditDeck from 'screens/DashboardScreens/EditDeck'
 import Home from 'screens/Home'
 import path from 'path'
-import StudyHabits from 'screens/DashboardScreens/StudyHabits'
+import Goals from 'screens/DashboardScreens/Goals'
 
 const homeRoutes = [
   {
@@ -28,8 +28,8 @@ const publicRoutes = [
     element: <PracticeDeck />,
   },
   {
-    path: '/study-habits',
-    element: <StudyHabits />,
+    path: '/goals',
+    element: <Goals />,
   },
 ]
 
