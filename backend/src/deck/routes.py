@@ -60,7 +60,7 @@ def getdecks():
     localId = args.get('localId')
     try:
         decks = []
-        id_list = []
+        # id_list = []
         if localId:
             user_decks = db.child("deck").order_by_child("userId").equal_to(localId).get()
             for deck in user_decks.each():
@@ -74,7 +74,7 @@ def getdecks():
             for deck in alldecks.each():
                 obj = deck.val()
                 obj['id'] = deck.key()
-                id_list.append(deck.key())
+                # id_list.append(deck.key())
                 cards = db.child("card").order_by_child("deckId").equal_to(deck.key()).get()
                 obj['cards_count'] = len(cards.val()) if cards.val() else 0
                 decks.append(obj)

@@ -21,7 +21,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
 import { isLabelWithInternallyDisabledControl } from "@testing-library/user-event/dist/utils";
 import { message } from "antd";
 import { useState } from "react";
@@ -56,8 +55,7 @@ const Login = () => {
           confirmButtonColor: '#221daf',
         }).then(() => {
           setIsSubmitting(false);
-          window.location.replace("/dashboard");
-          
+          window.location.replace("/dashboard"); 
         });
       })
       .catch((err) => {
