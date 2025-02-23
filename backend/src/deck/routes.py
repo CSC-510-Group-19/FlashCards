@@ -57,9 +57,7 @@ def getdeck(id):
 def getdecks():
     '''Fetch all decks. Shows private decks for authenticated users and public decks for non-authenticated users.'''
     args = request.args
-    # print(f"arguments are {args}")
     localId = args.get('localId')
-    # print(f"Local id is {localId}")
     try:
         decks = []
         id_list = []
@@ -74,16 +72,13 @@ def getdecks():
         else:
             alldecks = db.child("deck").order_by_child("visibility").equal_to("public").get()
             for deck in alldecks.each():
-                # print("Line 75")
                 obj = deck.val()
                 obj['id'] = deck.key()
                 id_list.append(deck.key())
-                # print("Line 78")
                 cards = db.child("card").order_by_child("deckId").equal_to(deck.key()).get()
                 obj['cards_count'] = len(cards.val()) if cards.val() else 0
                 decks.append(obj)
-                # print("Line 82")
-        print(f"************ Deck id's are are {id_list[:200]}")
+        # print(f"************ Deck id's are are {id_list[:200]}"). To remove test decks
         return jsonify(decks=decks, message='Fetching decks successfully', status=200), 200
     except Exception as e:
         return jsonify(decks=[], message=f"An error occurred {e}", status=500), 500
