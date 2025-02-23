@@ -44,7 +44,7 @@ class TestAuth(unittest.TestCase):
             data=json.dumps({'email': 'aaronadb@gmail.com', 'password': 'flashcards123'}),
             content_type='application/json'
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         
     @patch('src.auth.routes.auth')
     def test_signup_route_unregistered_user_invalid_email(self, mock_auth):
@@ -56,7 +56,7 @@ class TestAuth(unittest.TestCase):
             data=json.dumps({'email': 'test@gmail.com', 'password': 'password123'}),
             content_type='application/json'
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
 
     @patch('src.auth.routes.auth')
     def test_login_route_registered_user(self, mock_auth):
@@ -95,7 +95,7 @@ class TestAuth(unittest.TestCase):
             }),
             content_type='application/json'
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         response_data = json.loads(response.data.decode())
         self.assertEqual(response_data['message'], 'Login Failed')
         
@@ -112,7 +112,7 @@ class TestAuth(unittest.TestCase):
             }),
             content_type='application/json'
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         response_data = json.loads(response.data.decode())
         self.assertEqual(response_data['message'], 'Login Failed')
 

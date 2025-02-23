@@ -158,7 +158,7 @@ class CardTestApp(unittest.TestCase):
         mock_cards_db.child.return_value.order_by_child.return_value.equal_to.side_effect = Exception("Database error")
 
         response = self.client.get('/deck/Test/card/all')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         data = json.loads(response.data)
         self.assertEqual(data['cards'], [])
         self.assertTrue('An error occurred' in data['message'])
@@ -180,7 +180,7 @@ class CardTestApp(unittest.TestCase):
             content_type='application/json'
         )
         
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         data = json.loads(response.data)
         self.assertEqual(data['message'], 'Adding cards Failed')
 
@@ -219,7 +219,7 @@ class CardTestApp(unittest.TestCase):
             content_type='application/json'
         )
         
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         data = json.loads(response.data)
         self.assertTrue('Update Card Failed' in data['message'])
 
@@ -244,7 +244,7 @@ class CardTestApp(unittest.TestCase):
 
         response = self.client.delete('/deck/test_deck/delete/test_card')
         
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         data = json.loads(response.data)
         self.assertEqual(data['message'], 'Delete Card Failed')
 

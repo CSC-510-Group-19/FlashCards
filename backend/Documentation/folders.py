@@ -47,8 +47,8 @@ def getfolder(id):
         return jsonify(
             folder={},
             message=f"An error occurred: {e}",
-            status=400
-        ), 400
+            status=500
+        ), 500
 
 
 @folder_bp.route('/folders/all', methods=['GET'])
@@ -76,8 +76,8 @@ def getfolders():
         return jsonify(
             folders=[],
             message=f"An error occurred: {e}",
-            status=400
-        ), 400
+            status=500
+        ), 500
 
 
 @folder_bp.route('/folder/create', methods=['POST'])
@@ -101,8 +101,8 @@ def createfolder():
     except Exception as e:
         return jsonify(
             message=f"Failed to create folder: {e}",
-            status=400
-        ), 400
+            status=500
+        ), 500
 
 
 @folder_bp.route('/folder/update/<id>', methods=['PATCH'])
@@ -124,8 +124,8 @@ def updatefolder(id):
     except Exception as e:
         return jsonify(
             message=f"Failed to update folder: {e}",
-            status=400
-        ), 400
+            status=500
+        ), 500
 
 
 @folder_bp.route('/folder/delete/<id>', methods=['DELETE'])
@@ -142,8 +142,8 @@ def deletefolder(id):
     except Exception as e:
         return jsonify(
             message=f"Failed to delete folder: {e}",
-            status=400
-        ), 400
+            status=500
+        ), 500
 
 
 @folder_bp.route('/folder/add-deck', methods=['POST'])
@@ -167,8 +167,8 @@ def adddecktofolder():
     except Exception as e:
         return jsonify(
             message=f"Failed to add deck to folder: {e}",
-            status=400
-        ), 400
+            status=500
+        ), 500
 
 
 @folder_bp.route('/folder/remove-deck', methods=['DELETE'])
@@ -193,5 +193,5 @@ def removedeckfromfolder():
     except Exception as e:
         return jsonify(
             message=f"Failed to remove deck from folder: {e}",
-            status=400
-        ), 400
+            status=500
+        ), 500
