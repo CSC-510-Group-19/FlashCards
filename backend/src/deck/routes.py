@@ -24,6 +24,7 @@
 from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
 from datetime import datetime
+import random
 
 try:
     from .. import firebase
@@ -149,7 +150,161 @@ def update_last_opened(id):
     except Exception as e:
         return jsonify(message=f'Failed to update lastOpened: {e}', status=400), 400
 
+@deck_bp.route('/deck/streak/<id>', methods=['GET', 'PATCH'])
+@cross_origin(supports_credentials=True)
+def handle_streak(id):
+    if request.method == 'GET':
+        try:
+            deck_data = db.child("deck").child(id).get()
+            if not deck_data.val():
+                return jsonify(message="Deck not found", status=404), 404
 
+            streak = deck_data.val().get("streak", 0)  # Fetch the streak value
+            return jsonify(streak=streak, status=200), 200
+        except Exception as e:
+            return jsonify(message=f"Error fetching streak: {e}", status=400), 400
+
+    elif request.method == 'PATCH':
+        try:
+            data = request.get_json()  
+            # print(f"Received request to update streak for deck {id} with data: {data}")
+
+            deck_data = db.child("deck").child(id).get()
+            if not deck_data.val():
+                return jsonify(message="Deck not found", status=404), 404
+
+            # Process the streak logic
+            current_streak = deck_data.val().get("streak", 0)
+            last_study_date = deck_data.val().get("lastOpened")
+
+            today = datetime.now().date().isoformat()
+            # today = (datetime.now().date()).replace(day=datetime.now().day + 1)
+
+            if last_study_date == today:
+                return jsonify(message="Streak already updated for today", streak=current_streak, status=200), 200
+                    
+            print(f"Last study date: {last_study_date}, today: {today}")
+
+
+            if last_study_date:
+                last_date = datetime.fromisoformat(last_study_date).date()
+                if (datetime.now().date() - last_date).days == 1:
+                    current_streak += 1
+                else:
+                    current_streak = 1
+            else:
+                current_streak = 1
+
+            db.child("deck").child(id).update({
+                "streak": current_streak,
+                "lastOpened": today
+            })
+
+            # print(f"Updated streak for deck {id}: {current_streak}")
+
+            return jsonify(message="Streak updated", streak=current_streak, status=200), 200
+
+        except Exception as e:
+            print(f"Error updating streak for deck {id}: {e}")  
+            return jsonify(message=f"Failed to update streak: {e}", status=400), 400
+        
+@deck_bp.route('/deck/goal/<id>', methods=['GET', 'PATCH'])
+@cross_origin(supports_credentials=True)
+def handle_goal(id):
+    studyGoals = [
+        # "Study this deck for 20 minutes",
+        "Add 5 new flashcards to this deck"
+        # "Take a quiz in this deck"
+    ]  
+    if (request.method == 'GET'):
+        try:
+            deck_data = db.child("deck").child(id).get()
+            if not deck_data.val():
+                return jsonify(message="Deck not found", status=404), 404
+
+            # today = datetime.now().date().isoformat()
+            today = (datetime.now().date()).replace(day=datetime.now().day + 2).isoformat()
+
+            goal = deck_data.val().get("dailyGoal")
+            goal_date = deck_data.val().get("goalDate")
+            goal_completed = deck_data.val().get("goalCompleted", False)
+
+            # Assign a new goal if it's a new day or goal doesn't exist
+            if goal_date != today or not goal:
+                new_goal = random.choice(studyGoals)
+                
+                # Assign a target based on the goal type
+                target = 1
+                if "Study for 20 minutes" in new_goal:
+                    target = 20  # 20 minutes
+                elif "Add 5 new flashcards" in new_goal:
+                    target = 5  # 5 flashcards
+                elif "Take a quiz in this deck" in new_goal:
+                    target = 1 # 1 quiz
+                
+                db.child("deck").child(id).update({
+                    "dailyGoal": new_goal,
+                    "goalDate": today,
+                    "goalCompleted": False,
+                    "goalProgress": 0,
+                    "goalTarget": target
+                })
+                goal = new_goal
+                goal_completed = False
+
+            return jsonify(goal=goal, goalCompleted=goal_completed, status=200), 200
+        except Exception as e:
+            return jsonify(message=f"Error fetching goal: {e}", status=400), 400
+    elif request.method == 'PATCH':
+        """Marks the deck's goal as completed OR updates progress"""
+        try:
+            data = request.get_json()
+            progress = data.get("progress", 1)  # Default to +1 progress
+
+            deck_data = db.child("deck").child(id).get()
+            if not deck_data.val():
+                return jsonify(message="Deck not found", status=404), 404
+
+            goal_progress = deck_data.val().get("goalProgress", 0) + progress
+            goal_target = deck_data.val().get("goalTarget", 1)
+            goal_completed = goal_progress >= goal_target
+
+            db.child("deck").child(id).update({
+                "goalProgress": goal_progress,
+                "goalCompleted": goal_completed
+            })
+
+            return jsonify(message="Goal progress updated", goalProgress=goal_progress, goalCompleted=goal_completed, status=200), 200
+        except Exception as e:
+            return jsonify(message=f"Error updating goal: {e}", status=400), 400
+        
+@deck_bp.route('/deck/quizCompleted/<id>', methods=['PATCH'])
+@cross_origin(supports_credentials=True)
+def update_quiz_progress(id):
+    '''Automatically update progress when a quiz is completed.'''
+    try:
+        deck_data = db.child("deck").child(id).get()
+        if not deck_data.val():
+            return jsonify(message="Deck not found", status=404), 404
+
+        goal = deck_data.val().get("dailyGoal", "")
+        goal_progress = deck_data.val().get("goalProgress", 0)
+        goal_target = deck_data.val().get("goalTarget", 1)
+        goal_completed = deck_data.val().get("goalCompleted", False)
+
+        # If the goal is "Take a quiz", increase progress
+        if "quiz" in goal.lower() and not goal_completed:
+            goal_progress += 1
+            goal_completed = goal_progress >= goal_target
+
+        db.child("deck").child(id).update({
+            "goalProgress": goal_progress,
+            "goalCompleted": goal_completed
+        })
+
+        return jsonify(message="Quiz progress updated", goalProgress=goal_progress, goalCompleted=goal_completed, status=200), 200
+    except Exception as e:
+        return jsonify(message=f"Failed to update quiz progress: {e}", status=400), 400
 
 @deck_bp.route('/deck/<deckId>/leaderboard', methods=['GET'])
 @cross_origin(supports_credentials=True)

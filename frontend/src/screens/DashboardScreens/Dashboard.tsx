@@ -19,6 +19,7 @@ interface Deck {
   cards_count: number;
   lastOpened?: string; // Optional for recent decks
   folderId?: string;    // Optional to track folder assignment
+  streak?: number;
 }
 
 interface Folder {
@@ -58,6 +59,7 @@ const Dashboard = () => {
     fetchFolders();
   }, []);
 
+
   useEffect(() => {
     updateArrowsVisibilityLibrary();
     updateArrowsVisibilityRecent();
@@ -78,7 +80,19 @@ const Dashboard = () => {
     setFetchingDecks(true);
     try {
       const res = await http.get("/deck/all", { params: { localId } });
-      const _decks = res.data?.decks || [];
+      let _decks = res.data?.decks || [];
+
+      // Fetch streaks for all decks
+      _decks = await Promise.all(_decks.map(async (deck: Deck) => {
+        try {
+          const streakRes = await http.get(`/deck/streak/${deck.id}`);
+          return { ...deck, streak: streakRes.data.streak || 0 };
+        } catch (err) {
+          console.error(`Error fetching streak for deck ${deck.id}:`, err);
+          return { ...deck, streak: 0 };
+        }
+      }));
+
       setDecks(_decks);
 
       // Filter recent decks opened in the last 5 days
@@ -90,9 +104,7 @@ const Dashboard = () => {
 
       setRecentDecks(recent);
 
-      if (recent.length > 0) {
-        updateStreak(recent[0].lastOpened);
-      }
+
 
     } catch (err) {
       console.error("Error fetching decks:", err);
@@ -111,11 +123,15 @@ const Dashboard = () => {
       console.error("Error fetching folders:", err);
     }
   };
+
   const updateLastOpened = async (deckId: string) => {
     const timestamp = new Date().toISOString(); // Get the current timestamp
     await http.patch(`/deck/updateLastOpened/${deckId}`, { lastOpened: timestamp });
+    await http.patch(`/deck/streak/${deckId}`, {})
     fetchDecks(); // Refetch the decks to update both 'decks' and 'recentDecks'
   };
+
+
 
   const handleFolderClick = async (folder: Folder) => {
     try {
@@ -128,7 +144,7 @@ const Dashboard = () => {
     setIsFolderPopupVisible(true);
   };
 
-  const navigateToDeck = (deckId: string, deckTitle: string) => {
+  const navigateToDeck = async (deckId: string, deckTitle: string) => {
     navigate(`/deck/${deckId}/practice?title=${encodeURIComponent(deckTitle)}`);
   };
 
@@ -183,22 +199,6 @@ const Dashboard = () => {
     }
   };
 
-  const updateStreak = async (lastOpened: string) => {
-    if (!localId) return; 
-
-    const today = new Date().toDateString();
-    const lastStudyDate = new Date(lastOpened).toDateString();
-    
-    if (lastStudyDate !== today) {
-      try {
-        await http.patch('/user/${localId}/update-streak', {lastStudyDate: today});
-      } catch (err) {
-        console.error("Error updating streak: ", err)
-      }
-    }
-
-  }
-
   return (
     <div className="dashboard-page dashboard-commons">
       <Navbar isDashboard={true} onFolderCreated={fetchFolders} />
@@ -213,18 +213,6 @@ const Dashboard = () => {
                   <div className="welcome-text">
                     <h3><b>Hey, Welcome Back!</b> 👋</h3>
                     <p>Let's start creating, memorizing, and sharing your flashcards.</p>
-                  </div>
-
-                  {/* Streak Counter (Now on the right side) */}
-                  <div className="streak-container">
-                    <img
-                      src={isActive ? activeStreakImg : inactiveStreakImg}
-                      alt="Streak Icon"
-                      className="streak-icon"
-                    />
-                    <span className="streak-text">
-                      {streak > 0 ? `${streak} Day Streak` : "No Streak Active"}
-                    </span>
                   </div>
                 </div>
               </Card>
@@ -277,7 +265,7 @@ const Dashboard = () => {
                   </button>
                 )}
                 <div className="deck-slider" ref={sliderRefLibrary}>
-                  {decks.map(({ id, title, description, visibility, cards_count }) => (
+                  {decks.map(({ id, title, description, visibility, cards_count, streak }) => (
                     <div className="deck-card" key={id}>
                       <div className="d-flex justify-content-between align-items-center">
                         <Link to={`/deck/${id}/practice`} onClick={() => updateLastOpened(id)}>
@@ -288,8 +276,11 @@ const Dashboard = () => {
                           {visibility}
                         </div>
                       </div>
+
                       <p className="description">{description}</p>
                       <p className="items-count">{cards_count} item(s)</p>
+
+                      {/* <div className="deck-footer"> */}
                       <div className="menu">
                         <Link to={`/deck/${id}/practice`}><button className="btn text-left"><i className="lni lni-book"></i> Practice</button></Link>
                         <Link to={`/deck/${id}/update`}><button className="btn text-edit"><i className="lni lni-pencil-alt"></i> Update</button></Link>
@@ -311,7 +302,19 @@ const Dashboard = () => {
                             <option key={folder.id} value={folder.id}>{folder.name}</option>
                           ))}
                         </select>
+
+                        <div className="streak-container">
+                          <img
+                            src={(streak ?? 0) > 0 ? activeStreakImg : inactiveStreakImg}
+                            alt="Streak Icon"
+                            className="streak-icon"
+                          />
+                          <span className="streak-text">{`${streak || 0}`}</span>
+                        </div>
                       </div>
+                      {/* </div> */}
+
+
                     </div>
                   ))}
                 </div>

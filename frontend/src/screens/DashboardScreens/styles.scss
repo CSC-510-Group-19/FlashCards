@@ -17,6 +17,7 @@
             cursor: default;
             border-radius: 12px;
             box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+            display: flex;
 
             h5 {
                 margin-bottom: 8px;
@@ -130,24 +131,6 @@
         .welcome-text {
             flex: 1;
         }
-
-        .streak-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-
-            .streak-icon {
-                width: 40px;
-                height: auto;
-                object-fit: contain;
-            }
-
-            .streak-text {
-                font-size: 14px;
-                font-weight: bold;
-            }
-        }
     }
 }
 
@@ -184,32 +167,58 @@
     padding: 20px;
     border-radius: 8px;
     margin-top: 20px;
+    // box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+
+    h2 {
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+
+    button {
+        background-color: #007bff;
+        color: white;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:disabled {
+            background-color: #ccc;
+            cursor: default;
+        }
+    }
+}
+
+.deck-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.deck-goal {
+    background: #f8f9fa;
+    margin-top: 20px;
+    margin: 10px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.goal-header {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
     box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-  
-    h2 {
-      margin-bottom: 10px;
-    }
-  
-    p {
-      font-size: 1.1rem;
-      margin-bottom: 10px;
-    }
-  
-    button {
-      background-color: #007bff;
-      color: white;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-  
-      &:disabled {
-        background-color: #ccc;
-        cursor: default;
-      }
-    }
-  }
+}
+
 .create-deck-page {
 
     // background: #221daf;
@@ -364,6 +373,8 @@
     flex-shrink: 0;
 }
 
+
+
 .arrow {
     background: none;
     border: none;
@@ -442,3 +453,50 @@
     display: flex;
     gap: 10px;
 }
+
+.streak-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.streak-icon {
+    width: auto;
+    height: auto;
+    max-width: 20px;
+    max-height: 20px;
+}
+
+.streak-text {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.progress-container {
+    // display: flex;
+    // align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  progress {
+    width: 100px;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  
+  progress::-webkit-progress-bar {
+    background-color: #e0e0e0;
+    border-radius: 5px;
+  }
+  
+  progress::-webkit-progress-value {
+    background-color: #4caf50;
+    border-radius: 5px;
+  }
+
+  .btn-fail{
+    background: red;
+  }
