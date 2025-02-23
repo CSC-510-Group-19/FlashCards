@@ -1,49 +1,11 @@
-/*const readFromIndexedDB = async (dbName, storeName) => {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open("FlashcardsDB");
-  
-      request.onsuccess = (event) => {
-        const db = event.target.result;
-        const transaction = db.transaction("Flashcards", 'readonly');
-        const store = transaction.objectStore("Flashcards");
-        localId = store.getAll() || 'dWc0jg2imjXGVAUKb07n2YYgj273';
-  
-        dataRequest.onsuccess = () => {
-          resolve(dataRequest.result);
-        };
-  
-        dataRequest.onerror = () => {
-          reject('Error reading data from IndexedDB');
-        };
-      };
-  
-      request.onerror = () => {
-        reject('Error opening IndexedDB');
-      };
-    });
-  }; */
-/* window.addEventListener('message', (event) => {
-    // Ensure the message is from a trusted source
-    if (event.data.type === 'TO_EXTENSION') {
-      const { type, payload } = event.data;
-  
-      // Relay the message to the background script
-      localId = payload;
-    }
-});*/
 async function invokeAPI() {
-    /* if (!localId) {
-        console.error('localId is not set');
-        return;
-    } */
-    // const url = `http://127.0.0.1:5000/deck/all?localId=${localId};`
     const url = `http://127.0.0.1:5000/deck/all`;
     const response = await fetch(`http://127.0.0.1:5000/deck/all`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
         },
-        mode: 'cors', // Ensure CORS mode is enabled
+        mode: 'cors',
     });
     if (!response.ok) {
         throw new Error('Network response was not ok '+response);
@@ -55,7 +17,6 @@ async function invokeAPI() {
     const deckContainer = document.getElementById('deckContainer');
     deckContainer.innerHTML = '';
 
-    // Populate the deck container with radio buttons for each deck
     deckList.forEach(deck => {
         const deckDiv = document.createElement('div');
         const label = document.createElement('label');
@@ -70,7 +31,6 @@ async function invokeAPI() {
         deckContainer.appendChild(deckDiv);
     });
 
-    // Attach the event listener to the form
     const form = document.getElementById('form');
     if (form) {
         form.addEventListener('submit', function(event) {
@@ -120,4 +80,3 @@ function addCard() {
     });
 }
 invokeAPI()
-// No need to call getLocalId() here

@@ -69,7 +69,6 @@ const Explore = () => {
   const handleDeleteDeck = async (id: string) => {
     try {
       await http.delete(`/deck/delete/${id}`);
-      // Swal.fire("Deck Deleted Successfully!", "", "success").then(/*() => fetchDecks()*/);
     } catch (err) {
       Swal.fire("Deck Deletion Failed!", "", "error");
     }
@@ -133,7 +132,6 @@ const Explore = () => {
                     ({ id, title, description, visibility, cards_count }, index) => {
                       return (
                         <div className="col-md-4">
-                          {/*<Link to={`/deck/${id}/practice`}>*/}
                             <div className="flash-card__item">
                               <div className="d-flex justify-content-between align-items-center">
                                 <h5>{title}</h5>
@@ -145,23 +143,19 @@ const Explore = () => {
                               </div>
                               <p className="description">{description}</p>
                               <p className="items-count">{cards_count} item(s)</p>
-                                        <div className="menu">
+                                <div className="menu">
                                   <Link to={`/deck/${id}/practice`}><button className="btn text-left"><i className="lni lni-book"></i> Practice</button></Link>
                                   <Link to={`/deck/${id}/update`}><button className="btn text-edit"><i className="lni lni-pencil-alt"></i> Update</button></Link>
-                                    <Popconfirm
-                                      title="Are you sure to delete this deck?"
-                                      onConfirm={() => handleDeleteDeck(id)}
-                                      okText="Yes"
-                                      cancelText="No"
-                                    >
-                                      <button className="btn text-danger"><i className="lni lni-trash-can"></i> Delete</button>
-                                    </Popconfirm>
-                                
-                                    
-                                  </div>
-                               
+                                  <Popconfirm
+                                    title="Are you sure to delete this deck?"
+                                    onConfirm={() => handleDeleteDeck(id)}
+                                    okText="Yes"
+                                    cancelText="No"
+                                  >
+                                    <button className="btn text-danger"><i className="lni lni-trash-can"></i> Delete</button>
+                                  </Popconfirm>
+                                </div>
                             </div>
-                          {/*</Link>*/}
                         </div>
                       );
                     }
