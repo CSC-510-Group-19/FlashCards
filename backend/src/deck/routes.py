@@ -49,17 +49,17 @@ def getdeck(id):
         return jsonify(
             decks=[],
             message=f"An error occurred: {e}",
-            status=400
-        ), 400
+            status=500
+        ), 500
 
 @deck_bp.route('/deck/all', methods=['GET'])
 @cross_origin(supports_credentials=True)
 def getdecks():
     '''Fetch all decks. Shows private decks for authenticated users and public decks for non-authenticated users.'''
     args = request.args
-    print(f"arguments are {args}")
+    # print(f"arguments are {args}")
     localId = args.get('localId')
-    print(f"Local id is {localId}")
+    # print(f"Local id is {localId}")
     try:
         decks = []
         id_list = []
@@ -83,10 +83,10 @@ def getdecks():
                 obj['cards_count'] = len(cards.val()) if cards.val() else 0
                 decks.append(obj)
                 # print("Line 82")
-        print(f"Deck id's are are {id_list[:10]}")
+        print(f"************ Deck id's are are {id_list[:200]}")
         return jsonify(decks=decks, message='Fetching decks successfully', status=200), 200
     except Exception as e:
-        return jsonify(decks=[], message=f"An error occurred {e}", status=400), 400
+        return jsonify(decks=[], message=f"An error occurred {e}", status=500), 500
 
 @deck_bp.route('/deck/create', methods=['POST'])
 @cross_origin(supports_credentials=True)
@@ -110,7 +110,7 @@ def create():
 
         return jsonify(message='Create Deck Successful', status=201), 201
     except Exception as e:
-        return jsonify(message=f'Create Deck Failed {e}', status=400), 400
+        return jsonify(message=f'Create Deck Failed {e}', status=500), 500
 
 @deck_bp.route('/deck/update/<id>', methods=['PATCH'])
 @cross_origin(supports_credentials=True)
@@ -132,7 +132,7 @@ def update(id):
 
         return jsonify(message='Update Deck Successful', status=201), 201
     except Exception as e:
-        return jsonify(message=f'Update Deck Failed {e}', status=400), 400
+        return jsonify(message=f'Update Deck Failed {e}', status=500), 500
 
 @deck_bp.route('/deck/delete/<id>', methods=['DELETE'])
 @cross_origin(supports_credentials=True)
@@ -142,7 +142,7 @@ def delete(id):
         db.child("deck").child(id).remove()
         return jsonify(message='Delete Deck Successful', status=200), 200
     except Exception as e:
-        return jsonify(message=f'Delete Deck Failed {e}', status=400), 400
+        return jsonify(message=f'Delete Deck Failed {e}', status=500), 500
 
 @deck_bp.route('/deck/updateLastOpened/<id>', methods=['PATCH'])
 @cross_origin(supports_credentials=True)
@@ -153,7 +153,7 @@ def update_last_opened(id):
         db.child("deck").child(id).update({"lastOpened": current_time})
         return jsonify(message='Deck lastOpened updated successfully', status=200), 200
     except Exception as e:
-        return jsonify(message=f'Failed to update lastOpened: {e}', status=400), 400
+        return jsonify(message=f'Failed to update lastOpened: {e}', status=500), 500
 
 
 
@@ -186,8 +186,8 @@ def get_leaderboard(deckId):
         return jsonify({
             "leaderboard": [],
             "message": f"An error occurred: {e}",
-            "status": 400
-        }), 400
+            "status": 500
+        }), 500
     
 @deck_bp.route('/deck/<deck_id>/update-leaderboard', methods=['POST'])
 @cross_origin(supports_credentials=True)
@@ -201,7 +201,7 @@ def update_leaderboard(deck_id):
         incorrect = data.get("incorrect")
 
         if not user_id:
-            return jsonify({"message": "User ID is required"}), 400  # Validate userId presence
+            return jsonify({"message": "User ID is required"}), 500  # Validate userId presence
 
         # Use user_id from request body to update the leaderboard
         leaderboard_ref = db.child("leaderboard").child(deck_id).child(user_id)
@@ -250,8 +250,8 @@ def get_user_score(deckId, userId):
     except Exception as e:
         return jsonify({
             "message": f"An error occurred: {e}",
-            "status": 400
-        }), 400
+            "status": 500
+        }), 500
 
 # @deck_bp.route('/deck/<id>/last-opened', methods=['PATCH'])
 # @cross_origin(supports_credentials=True)
@@ -271,5 +271,5 @@ def get_user_score(deckId, userId):
 #     except Exception as e:
 #         return jsonify(
 #             message=f"Failed to update last opened time: {e}",
-#             status=400
-#         ), 400
+#             status=500
+#         ), 500

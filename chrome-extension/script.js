@@ -1,4 +1,3 @@
-var localId = 'Hello1'
 /*const readFromIndexedDB = async (dbName, storeName) => {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open("FlashcardsDB");
@@ -39,7 +38,7 @@ async function invokeAPI() {
     } */
     // const url = `http://127.0.0.1:5000/deck/all?localId=${localId};`
     const url = `http://127.0.0.1:5000/deck/all`;
-    const response = await fetch(`http://127.0.0.1:5000/deck/all?localId=${localId}`, {
+    const response = await fetch(`http://127.0.0.1:5000/deck/all`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -90,10 +89,35 @@ function addCard() {
     const backText = document.getElementById("back").value;
     const hintText = document.getElementById("hint").value;
 
-    console.log("Chosen deckId is " + chosenDeckId);
-    console.log("Front text is " + frontText);
-    console.log("Back text is " + backText);
-    console.log("Hint text is " + hintText);
+    data = {
+        cards:
+        [
+            {
+                'front': frontText,
+                'back': backText,
+                'hint': hintText
+            }
+        ]
+    }
+    fetch(`http://127.0.0.1:5000/deck/` + chosenDeckId + `/public/card/create`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(responseData => {
+        console.log('Success:', responseData);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 }
 invokeAPI()
 // No need to call getLocalId() here

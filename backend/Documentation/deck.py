@@ -48,8 +48,8 @@ def getdeck(id):
         return jsonify(
             decks = [],
             message = f"An error occurred: {e}",
-            status = 400
-        ), 400
+            status = 500
+        ), 500
 
 
 @deck_bp.route('/deck/all', methods = ['GET'])
@@ -96,8 +96,8 @@ def getdecks():
         return jsonify(
             decks = [],
             message = f"An error occurred {e}",
-            status = 400
-        ), 400
+            status = 500
+        ), 500
 
 
 
@@ -123,8 +123,8 @@ def create():
     except Exception as e:
         return jsonify(
             message = f'Create Deck Failed {e}',
-            status = 400
-        ), 400
+            status = 500
+        ), 500
 
 
 @deck_bp.route('/deck/update/<id>', methods = ['PATCH'])
@@ -149,8 +149,8 @@ def update(id):
     except Exception as e:
         return jsonify(
             message = f'Update Deck Failed {e}',
-            status = 400
-        ), 400
+            status = 500
+        ), 500
  
 
 @deck_bp.route('/deck/delete/<id>', methods = ['DELETE'])
@@ -167,5 +167,5 @@ def delete(id):
     except Exception as e:
         return jsonify(
             message = f'Delete Deck Failed {e}',
-            status = 400
-        ), 400
+            status = 500
+        ), 500
