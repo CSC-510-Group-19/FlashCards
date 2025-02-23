@@ -58,8 +58,8 @@ def signup():
         '''if the registration process is not successful, this message is displayed'''
         return jsonify(
             message = 'Registration Failed',        
-            status = 400
-        ), 400
+            status = 500
+        ), 500
 
 @auth_bp.route('/login', methods=['POST'])
 @cross_origin(supports_credentials=True)
@@ -81,8 +81,8 @@ def login():
         '''if login is not successful, this message is displayed'''
         return jsonify(
             message = 'Login Failed',               
-            status = 400
-        ), 400
+            status = 500
+        ), 500
 
 if __name__ == '__main__':
     app.debug = True

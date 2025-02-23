@@ -91,7 +91,7 @@ class TestDeck(unittest.TestCase):
                 response = self.app.patch('/deck/updateLastOpened/Test', content_type='application/json')
 
                 # Assert: Check the response status code for failure
-                assert response.status_code == 400
+                assert response.status_code == 500
                 response_data = json.loads(response.data)
                 assert response_data['message'] == 'Failed to update lastOpened: Database update failed'
     
@@ -220,7 +220,7 @@ class TestDeck(unittest.TestCase):
         response = self.app.get(f'/deck/{deck_id}/user-score/{user_id}')
 
         # Assert: Check the response status code and message
-        assert response.status_code == 400
+        assert response.status_code == 500
         response_data = json.loads(response.data)
         assert response_data['message'] == "An error occurred: Database error"
 
@@ -231,7 +231,7 @@ class TestDeck(unittest.TestCase):
         mock_db.child.return_value.child.return_value.get.side_effect = Exception("Database error")
         
         response = self.app.get('/deck/Test')
-        assert response.status_code == 400
+        assert response.status_code == 500
         response_data = json.loads(response.data)
         assert response_data['decks'] == []
         assert "An error occurred: Database error" in response_data['message']
@@ -288,7 +288,7 @@ class TestDeck(unittest.TestCase):
         mock_db.child.return_value.order_by_child.return_value.equal_to.side_effect = Exception("Database error")
 
         response = self.app.get('/deck/all', query_string=dict(localId='Test'))
-        assert response.status_code == 400
+        assert response.status_code == 500
         response_data = json.loads(response.data)
         assert response_data['decks'] == []
         assert "An error occurred Database error" in response_data['message']
@@ -307,7 +307,7 @@ class TestDeck(unittest.TestCase):
                                     visibility='public'
                                 )),
                                 content_type='application/json')
-        assert response.status_code == 400
+        assert response.status_code == 500
         response_data = json.loads(response.data)
         assert "Update Deck Failed Database error" in response_data['message']
 
@@ -318,7 +318,7 @@ class TestDeck(unittest.TestCase):
         mock_db.child.return_value.child.return_value.remove.side_effect = Exception("Database error")
 
         response = self.app.delete('/deck/delete/Test')
-        assert response.status_code == 400
+        assert response.status_code == 500
         response_data = json.loads(response.data)
         assert "Delete Deck Failed Database error" in response_data['message']
 
@@ -329,7 +329,7 @@ class TestDeck(unittest.TestCase):
         mock_db.child.return_value.child.return_value.get.side_effect = Exception("Database error")
 
         response = self.app.get('/deck/TestDeck/leaderboard')
-        assert response.status_code == 400
+        assert response.status_code == 500
         response_data = json.loads(response.data)
         assert response_data['leaderboard'] == []
         assert "An error occurred: Database error" in response_data['message']
@@ -344,7 +344,7 @@ class TestDeck(unittest.TestCase):
                                    "incorrect": 2
                                }),
                                content_type='application/json')
-        assert response.status_code == 400
+        assert response.status_code == 500
         response_data = json.loads(response.data)
         assert response_data['message'] == "User ID is required"
 

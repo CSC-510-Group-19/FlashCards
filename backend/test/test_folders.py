@@ -42,7 +42,7 @@ class TestFolders(unittest.TestCase):
     def test_get_folders_no_user_id(self):
         '''Test fetch all folders without userId returns error'''
         response = self.app.get(f'/folders/all')
-        assert response.status_code == 400
+        assert response.status_code == 500
 
     @patch('src.folders.routes.db')
     def test_create_folder_success(self, mock_db):
@@ -61,7 +61,7 @@ class TestFolders(unittest.TestCase):
         '''Test folder creation failure due to missing data'''
         folder_data = {"userId": "test_user_id"}  # Missing name
         response = self.app.post('/folder/create', data=json.dumps(folder_data), content_type='application/json')
-        assert response.status_code == 400
+        assert response.status_code == 500
         response_data = json.loads(response.data)
         assert "Failed to create folder" in response_data['message']
 
@@ -86,7 +86,7 @@ class TestFolders(unittest.TestCase):
         mock_db.child.return_value.child.return_value.update.side_effect = Exception("Update failed")
         
         response = self.app.patch(f'/folder/update/{folder_id}', data=json.dumps(folder_data), content_type='application/json')
-        assert response.status_code == 400
+        assert response.status_code == 500
         response_data = json.loads(response.data)
         assert "Failed to update folder" in response_data['message']
 
@@ -108,7 +108,7 @@ class TestFolders(unittest.TestCase):
         mock_db.child.return_value.child.return_value.remove.side_effect = Exception("Delete failed")
 
         response = self.app.delete(f'/folder/delete/{folder_id}')
-        assert response.status_code == 400
+        assert response.status_code == 500
         response_data = json.loads(response.data)
         assert "Failed to delete folder" in response_data['message']
 
@@ -128,7 +128,7 @@ class TestFolders(unittest.TestCase):
         mock_db.child.return_value.push.side_effect = Exception("Add failed")
 
         response = self.app.post('/deck/add-deck', data=json.dumps(deck_data), content_type='application/json')
-        assert response.status_code == 400
+        assert response.status_code == 500
         response_data = json.loads(response.data)
         assert "Failed to add deck to folder" in response_data['message']
 
@@ -148,7 +148,7 @@ class TestFolders(unittest.TestCase):
         mock_db.child.return_value.order_by_child.return_value.equal_to.return_value.get.side_effect = Exception("Remove failed")
 
         response = self.app.delete('/folder/remove-deck', data=json.dumps(deck_data), content_type='application/json')
-        assert response.status_code == 400
+        assert response.status_code == 500
         response_data = json.loads(response.data)
         assert "Failed to remove deck from folder" in response_data['message']
 
@@ -186,6 +186,6 @@ class TestFolders(unittest.TestCase):
         mock_db.child.return_value.order_by_child.return_value.equal_to.return_value.get.side_effect = Exception("Retrieval failed")
 
         response = self.app.get(f'/decks/{folder_id}')
-        assert response.status_code == 400
+        assert response.status_code == 500
         response_data = json.loads(response.data)
         assert "An error occurred: Retrieval failed" in response_data['message']

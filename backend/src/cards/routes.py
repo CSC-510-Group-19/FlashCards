@@ -54,8 +54,8 @@ def getcards(deckId):
         return jsonify(
             cards = [],
             message = f"An error occurred {e}",
-            status = 400
-        ), 400
+            status = 500
+        ), 500
 
 
 @card_bp.route('/deck/<deckId>/card/create', methods = ['POST'])
@@ -90,8 +90,37 @@ def createcards(deckId):
     except:
         return jsonify(
             message = 'Adding cards Failed',
-            status = 400
-        ), 400
+            status = 500
+        ), 500
+    
+@card_bp.route('/deck/<deckId>/public/card/create', methods = ['POST'])
+@cross_origin(supports_credentials=True)
+def create_public_cards(deckId):
+    '''This method is routed when the user requests to create new cards in a public deck. 
+    Only the deckid is required to add cards to a deck.'''
+    try:
+        data = request.get_json()
+        cards = data['cards']
+        
+        '''add new cards'''
+        for card in cards:
+            db.child("card").push({
+                "deckId": deckId,
+                "front": card['front'], 
+                "back": card['back'],
+                "hint": card['hint']
+            })
+        
+        return jsonify(
+            message = 'Adding cards Successful',
+            status = 200
+        ), 200
+    except Exception as e:
+        print(str(e))
+        return jsonify(
+            message = 'Adding cards Failed',
+            status = 500
+        ), 500
 
 
 @card_bp.route('/deck/<id>/update/<cardid>', methods = ['PATCH'])
@@ -117,8 +146,8 @@ def updatecard(id,cardid):
     except Exception as e:
         return jsonify(
             message = f'Update Card Failed {e}',
-            status = 400
-        ), 400
+            status = 500
+        ), 500
  
 
 @card_bp.route('/deck/<id>/delete/<cardid>', methods = ['DELETE'])
@@ -139,5 +168,5 @@ def deletecard(id,cardid):
     except:
         return jsonify(
             message = 'Delete Card Failed',
-            status = 400
-        ), 400
+            status = 500
+        ), 500

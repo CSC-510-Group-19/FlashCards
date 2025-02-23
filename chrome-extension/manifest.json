@@ -1,0 +1,28 @@
+{
+    "name": "Create Flashcards",
+    "version": "1.0.0",
+    "description": "Create flashcards",
+    "manifest_version": 3,
+    "author": "Abhinav Sharma",
+    "action":{
+        "default_popup": "index.html",
+        "default_title": "Create Flashcards"
+    },
+    "permissions": [
+        "scripting",
+        "activeTab",
+        "storage"
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'; connect-src http://127.0.0.1:5000"
+    },
+    "content_scripts": [
+        {
+          "matches": ["localhost:3000/*"]
+        }
+    ],
+    "host_permissions": [
+        "http://127.0.0.1:5000/",
+        "http://127.0.0.1:3000/"
+    ]
+}
