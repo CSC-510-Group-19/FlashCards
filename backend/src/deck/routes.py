@@ -212,9 +212,9 @@ def handle_streak(id):
 @cross_origin(supports_credentials=True)
 def handle_goal(id):
     studyGoals = [
-        # "Study this deck for 20 minutes",
-        "Add 5 new flashcards to this deck"
-        # "Take a quiz in this deck"
+        "Study this deck for 20 minutes",
+        "Add 5 new flashcards to this deck",
+        "Take a quiz in this deck"
     ]  
     if (request.method == 'GET'):
         try:
@@ -222,8 +222,8 @@ def handle_goal(id):
             if not deck_data.val():
                 return jsonify(message="Deck not found", status=404), 404
 
-            # today = datetime.now().date().isoformat()
-            today = (datetime.now().date()).replace(day=datetime.now().day + 2).isoformat()
+            today = datetime.now().date().isoformat()
+            # today = (datetime.now().date()).replace(day=datetime.now().day + 3).isoformat()
 
             goal = deck_data.val().get("dailyGoal")
             goal_date = deck_data.val().get("goalDate")
@@ -235,10 +235,13 @@ def handle_goal(id):
                 
                 # Assign a target based on the goal type
                 target = 1
-                if "Study for 20 minutes" in new_goal:
-                    target = 20  # 20 minutes
+                if "Study this deck for 20 minutes" in new_goal:
+                    target = 150  # 20 minutes (1200 seconds)
                 elif "Add 5 new flashcards" in new_goal:
-                    target = 5  # 5 flashcards
+                    current_card_count = db.child("card").order_by_child("deckId").equal_to(id).get().val()
+                    current_card_count = len(current_card_count) if current_card_count else 0
+
+                    target = current_card_count + 5  # 5 flashcards
                 elif "Take a quiz in this deck" in new_goal:
                     target = 1 # 1 quiz
                 
@@ -260,14 +263,27 @@ def handle_goal(id):
         try:
             data = request.get_json()
             progress = data.get("progress", 1)  # Default to +1 progress
+            
+            print("recived patch with ", progress)
 
             deck_data = db.child("deck").child(id).get()
             if not deck_data.val():
                 return jsonify(message="Deck not found", status=404), 404
+            
+            goal = deck_data.val().get("dailyGoal", "")
+            
+            print(goal)
 
-            goal_progress = deck_data.val().get("goalProgress", 0) + progress
+            if data and "Study this deck for 20 minutes" in goal:
+                goal_progress = deck_data.val().get("goalProgress", 0) + progress
+            else:
+                goal_progress = deck_data.val().get("goalProgress", 0) + progress
             goal_target = deck_data.val().get("goalTarget", 1)
             goal_completed = goal_progress >= goal_target
+            
+            print("goal progress: ", goal_progress)
+            print("goal target: ", goal_target)
+            print(goal_completed)
 
             db.child("deck").child(id).update({
                 "goalProgress": goal_progress,
@@ -305,6 +321,8 @@ def update_quiz_progress(id):
         return jsonify(message="Quiz progress updated", goalProgress=goal_progress, goalCompleted=goal_completed, status=200), 200
     except Exception as e:
         return jsonify(message=f"Failed to update quiz progress: {e}", status=400), 400
+    
+
 
 @deck_bp.route('/deck/<deckId>/leaderboard', methods=['GET'])
 @cross_origin(supports_credentials=True)
