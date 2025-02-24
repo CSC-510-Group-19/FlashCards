@@ -20,7 +20,7 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #SOFTWARE.
 
-'''import dependancies'''
+'''import dependencies'''
 from flask import Blueprint, jsonify               
 from flask import current_app as app
 from flask_cors import cross_origin

@@ -13,13 +13,46 @@ db = firebase.database()
 @user_bp.route('/user/<user_id>/streak', methods=['GET'])
 @cross_origin(supports_credentials=True)
 def get_streak(user_id):
-    '''get the user's current streak'''
-    try: 
+    '''Get the user's current streak'''
+    try:
+        # Get token from request headers
+        id_token = request.headers.get("Authorization")
+        if not id_token:
+            return jsonify(message="Missing authentication token", status=401), 401
+        
+        # Verify Firebase ID token
+        decoded_token = auth.verify_id_token(id_token.replace("Bearer ", ""))
+        if decoded_token["uid"] != user_id:
+            return jsonify(message="Unauthorized access", status=403), 403
+        
+        # Fetch user streak from Firebase
         user_data = db.child("users").child(user_id).get()
         streak = user_data.val().get("streak", 0) if user_data.val() else 0
         return jsonify(streak=streak, status=200), 200
+    
     except Exception as e:
         return jsonify(message=f"Error fetching streak: {e}", status=400), 400
+
+# @user_bp.route('/user/<user_id>/streak', methods=['GET'])
+# @cross_origin(supports_credentials=True)
+# def get_streak(user_id):
+#     '''get the user's current streak'''
+#     try: 
+#         print(f"Fetching streak for user: {user_id}")  # Debug log
+
+#         user_data = db.child("users").child(user_id).get()
+
+#         print(f"Firebase response: {user_data.val()}")  # Print the Firebase data
+#         if not user_data.val():
+#             return jsonify(message=f"User {user_id} not found in database", status=404), 404
+        
+#         streak = user_data.val().get("streak", 0) if user_data.val() else 0
+        
+#         print(f"User {user_id} has a streak of {streak}")
+
+#         return jsonify(streak=streak, status=200), 200
+#     except Exception as e:
+#         return jsonify(message=f"Error fetching streak: {e}", status=400), 400
                     
 @user_bp.route('/user/<user_id>/update-streak', methods=['PATCH'])
 @cross_origin(supports_credentials=True)

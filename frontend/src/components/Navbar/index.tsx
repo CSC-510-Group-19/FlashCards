@@ -48,8 +48,8 @@ const Navbar = ({ isDashboard, onFolderCreated }: NavbarProps) => {
           {isDashboard ? (
             <div className="navbar-nav ml-auto navbar-centers gap-4">
               <li className="nav-item">
-                <Link className="nav-link active" aria-current="page" to="/study-habits">
-                  Study Habits
+                <Link className="nav-link active" aria-current="page" to="/goals">
+                  Goals
                 </Link>
               </li>
               <li className="nav-item">
@@ -74,8 +74,8 @@ const Navbar = ({ isDashboard, onFolderCreated }: NavbarProps) => {
           ) : (
             <div className="navbar-nav ml-auto navbar-centers gap-4">
               <li className="nav-item">
-                <Link className="nav-link active" aria-current="page" to="/study-habits">
-                  Study Habits
+                <Link className="nav-link active" aria-current="page" to="/goals">
+                  Goals
                 </Link>
               </li>
               <li className="nav-item">
