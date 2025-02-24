@@ -84,27 +84,14 @@ const Dashboard = () => {
 
       // Fetch streaks for all decks
       _decks = await Promise.all(_decks.map(async (deck: Deck) => {
-        let goal = { goal: "No goal", completed: false, progress: 0, target: 1 };
-
         try {
           const streakRes = await http.get(`/deck/streak/${deck.id}`);
-          // return { ...deck, streak: streakRes.data.streak || 0 };
+          return { ...deck, streak: streakRes.data.streak || 0 };
         } catch (err) {
           console.error(`Error fetching streak for deck ${deck.id}:`, err);
           return { ...deck, streak: 0 };
         }
-
-        try {
-          const goalRes = await http.get(`/deck/goal/${deck.id}`);
-          goal = {
-              goal: goalRes.data.goal,
-              completed: goalRes.data.goalCompleted,
-              progress: goalRes.data.goalProgress,
-              target: goalRes.data.goalTarget,
-          };
-      } catch (err) {
-          console.error(`Error fetching goal for deck ${deck.id}:`, err);
-      }
+        
       }));
 
       setDecks(_decks);
