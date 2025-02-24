@@ -21,3 +21,6 @@
 pip install -r requirements.txt
 python3 test/test.py
 ````````````````````````````````````````````````````````````
+
+## Updated install instructions
+1. Ensure you are running Python 3.9. Earlier versions are incompatible.
