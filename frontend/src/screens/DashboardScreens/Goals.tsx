@@ -322,18 +322,14 @@ const StudyHabits = () => {
                       <h5>{title}</h5>
                     </Link>
                     <p className="goal-text">{deckGoals[id]?.goal || "No goal assigned"}</p>
-                    {/* Progress Bar */}
+                    {/* Progress Bar
                     <div className="progress-container">
                       <progress
                         value={deckGoals[id]?.progress || 0}
                         max={deckGoals[id]?.target || 1}
                       ></progress>
-                    </div>
-                    <p></p>
-
-                    {/* Button to update progress*/}
-           
-                      {deckGoals[id]?.completed ? "✅ Completed" : "❌ Not Completed"}
+                    </div> */}
+                    {deckGoals[id]?.completed ? "✅ Completed" : "❌ Not Completed"}
                   </div>
                 </div>
               ))}
