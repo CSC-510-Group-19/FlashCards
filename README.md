@@ -56,8 +56,8 @@ FlashCards is a spaced repetition learning platform to <b>create</b>, <b>memoriz
 <a href="https://www.heroku.com/"><img src="https://img.shields.io/badge/Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white" /></a>
 
 ## Getting started & Installation:
-- Backend [See README.md](https://github.com/WolfByteCollective/FlashCards/blob/main/backend/Readme.md)
-- Frontend [See README.md](https://github.com/WolfByteCollective/FlashCards/blob/main/frontend/README.md)
+- Backend [See README.md](https://github.com/Group21-SWE/FlashCards/blob/main/backend/Readme.md)
+- Frontend [See README.md](https://github.com/Group21-SWE/FlashCards/blob/main/frontend/README.md)
 
 ## Current Screens
 
