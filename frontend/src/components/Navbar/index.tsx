@@ -2,7 +2,7 @@ import "./styles.scss";
 import { useState } from "react";
 import { Modal, Input, Button } from "antd";
 import Swal from "sweetalert2";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import http from "utils/api";
 
 interface NavbarProps {
@@ -15,6 +15,7 @@ const Navbar = ({ isDashboard, onFolderCreated }: NavbarProps) => {
   const [newFolderName, setNewFolderName] = useState("");
   const flashCardUser = window.localStorage.getItem("flashCardUser");
   const { localId } = (flashCardUser && JSON.parse(flashCardUser)) || {};
+  const { id } = useParams();
 
   const handleLogout = () => {
     window.localStorage.removeItem("flashCardUser");
@@ -28,7 +29,20 @@ const Navbar = ({ isDashboard, onFolderCreated }: NavbarProps) => {
     }
 
     try {
-      await http.post("/folder/create", { name: newFolderName, userId: localId });
+      // var deckId = useParams();
+      await http.post("/deck/create", {
+        localId: localId, 
+        title: newFolderName + " Missed Questions", 
+        description: "This deck contains questions you have missed for a quick review!",
+        visibility: 'private'})
+      }
+      catch (err) {
+        Swal.fire("Problem exists in creating empty deck", "", "error");
+      }
+      try {
+      
+      // var deckId = localId;
+      await http.post("/folder/create", { name: newFolderName, userId: localId, deckId: id });
       Swal.fire("Folder Created Successfully!", "", "success");
       setIsModalVisible(false);
       setNewFolderName("");

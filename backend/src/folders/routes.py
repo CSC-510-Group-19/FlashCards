@@ -99,16 +99,31 @@ def createfolder():
         print("data", data)
         folder_name = data['name']
         user_id = data['userId']
+        missed_questions_deck = data['deckId']
+
         folder_ref = db.child("folder").push({
             "name": folder_name,
-            "userId": user_id
+            "userId": user_id,
+            "progress": 0,
+            "missed_questions": missed_questions_deck
         })
         new_folder_id = folder_ref['name']  # Retrieve auto-generated ID
+        
+        # Add empty deck to folder
+        deck_id = folder_ref['missed_questions']
+
+        missed_questions_deck = db.child("folder_deck").push({
+            "folderId": new_folder_id,
+            "deckId": deck_id
+        })
+
         return jsonify(
             folder={
                 "id": new_folder_id,
                 "name": folder_name,
-                "decks": []
+                "decks": [missed_questions_deck],
+                "progress": 0,
+                "missed_questions": missed_questions_deck
             },
             message='Folder created successfully',
             status=201
