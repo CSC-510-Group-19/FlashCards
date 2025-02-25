@@ -28,7 +28,7 @@ export default function Flashcard({cards}: any) {
         console.error("Error fetching goal:", err);
       }
     };
-  
+    updateStreak();
     fetchGoal();
   }, [id]);
   useEffect(() => {
@@ -61,6 +61,15 @@ export default function Flashcard({cards}: any) {
       console.log("Study goal updated:", elapsedTime);
     } catch (err) {
       console.error("Error updating study goal:", err);
+    }
+  };
+
+  const updateStreak = async () => {
+    try {
+      await http.patch(`/deck/streak/${id}`, {});
+      console.log("Streak updated successfully");
+    } catch (err) {
+      console.error("Error updating streak:", err);
     }
   };
 

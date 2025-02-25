@@ -37,7 +37,7 @@ const Dashboard = () => {
   const [selectedFolderDecks, setSelectedFolderDecks] = useState<Deck[]>([]);
 
   // for streaks
-  const [streak, setStreak] = useState(10); // Replace with API data later
+  const [streak, setStreak] = useState(10);
   const isActive = streak > 0; // Streak is active if it's greater than 0
 
 
@@ -83,16 +83,16 @@ const Dashboard = () => {
       let _decks = res.data?.decks || [];
 
       // Fetch streaks for all decks
-      _decks = await Promise.all(_decks.map(async (deck: Deck) => {
-        try {
-          const streakRes = await http.get(`/deck/streak/${deck.id}`);
-          return { ...deck, streak: streakRes.data.streak || 0 };
-        } catch (err) {
-          console.error(`Error fetching streak for deck ${deck.id}:`, err);
-          return { ...deck, streak: 0 };
-        }
+      // _decks = await Promise.all(_decks.map(async (deck: Deck) => {
+      //   try {
+      //     const streakRes = await http.get(`/deck/streak/${deck.id}`);
+      //     return { ...deck, streak: streakRes.data.streak || 0 };
+      //   } catch (err) {
+      //     console.error(`Error fetching streak for deck ${deck.id}:`, err);
+      //     return { ...deck, streak: 0 };
+      //   }
         
-      }));
+      // }));
 
       setDecks(_decks);
 
