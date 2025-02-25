@@ -55,7 +55,6 @@ class TestDeck(unittest.TestCase):
         '''Test the create deck route of our app'''
         response = self.app.post('/deck/create', data=json.dumps(dict(localId='Test', title='TestDeck', description='This is a test deck', visibility='public')), content_type='application/json')
         assert response.status_code == 201
-        
     
     def test_update_deck_route_post(self):
         '''Test the deck/update route of our app with'''
@@ -365,5 +364,16 @@ class TestDeck(unittest.TestCase):
         assert response.status_code == 500
         response_data = json.loads(response.data)
         assert response_data['message'] == "Failed to update leaderboard"
+        
+    @patch('src.deck.routes.db.child')
+    def test_get_streak(self, mock_db_child):
+        '''Test getting the streak for a deck'''
+        mock_db_child.return_value.child.return_value.get.return_value.val.return_value = {"streak": 5}
+        response = self.app.get('/deck/streak/Test')
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['streak'], 5) 
+        
+        
 if __name__=="__main__":
     unittest.main()
