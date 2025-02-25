@@ -7,6 +7,13 @@ import http from "utils/api";
 import Swal from "sweetalert2";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import Navbar from "../../components/Navbar";
+import { render } from "react-dom";
+import {
+  CircularProgressbar,
+  CircularProgressbarWithChildren,
+  buildStyles
+} from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 
 interface Deck {
   id: string;
@@ -23,6 +30,8 @@ interface Folder {
   id: string;
   name: string;
   decks: Deck[];
+  progress: number;
+  missed_questions: Deck;
 }
 
 const Dashboard = () => {
@@ -205,6 +214,8 @@ const Dashboard = () => {
                   <div className="folder-container" onClick={() => handleFolderClick(folder)}>
                     <h5>{folder.name}</h5>
                     <p>{folder.decks.length > 0 ? `${folder.decks.length} deck(s)` : null}</p>
+                    <Link to={`/deck/${folder.missed_questions}/practice`}><button className="btn text-left"><i className="lni lni-book"></i>Practice Missed Questions!</button></Link>
+                    <CircularProgressbar value={folder.progress} text={`${folder.progress}%`} />
                     <p>{folder.decks.length === 0 ? `${folder.decks.length} deck(s)` : null}</p>
                   </div>
                 </div>
