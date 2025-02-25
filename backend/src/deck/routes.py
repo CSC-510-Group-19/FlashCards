@@ -184,7 +184,7 @@ def handle_streak(id):
             if last_study_date == today:
                 return jsonify(message="Streak already updated for today", streak=current_streak, status=200), 200
                     
-            print(f"Last study date: {last_study_date}, today: {today}")
+            # print(f"Last study date: {last_study_date}, today: {today}")
 
 
             if last_study_date:
