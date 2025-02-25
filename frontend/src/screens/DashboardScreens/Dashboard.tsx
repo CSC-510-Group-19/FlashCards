@@ -214,10 +214,16 @@ const Dashboard = () => {
                   <div className="folder-container" onClick={() => handleFolderClick(folder)}>
                     <h5>{folder.name}</h5>
                     <p>{folder.decks.length > 0 ? `${folder.decks.length} deck(s)` : null}</p>
-                    <Link to={`/deck/${folder.missed_questions}/practice`}><button className="btn text-left"><i className="lni lni-book"></i>Practice Missed Questions!</button></Link>
-                    <CircularProgressbar value={folder.progress} text={`${folder.progress}%`} />
-                    <p>{folder.decks.length === 0 ? `${folder.decks.length} deck(s)` : null}</p>
-                  </div>
+                    {
+                      folder.decks.length > 0 ?
+                      <div className="menu">
+                        <Link to={`/deck/${folder.missed_questions}/practice`}><button className="btn text-left"><i className="lni lni-book"></i>Practice Missed Questions!</button></Link>
+                        <CircularProgressbar className="progress-circle" value={folder.progress} text={`${folder.progress}%`} />
+                      </div>
+                      : null
+                    }
+                      <p>{folder.decks.length === 0 ? `${folder.decks.length} deck(s)` : null}</p>
+                    </div>
                 </div>
               ))
             )}
