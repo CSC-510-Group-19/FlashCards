@@ -131,6 +131,7 @@ const Dashboard = () => {
   const fetchFolders = async () => {
     try {
       const res = await http.get("/folders/all", { params: { userId: localId } });
+      console.log(res)
       setFolders(res.data?.folders || []);
       await http.post("/folders/all/update", { userId: localId })
     } catch (err) {
@@ -151,7 +152,8 @@ const Dashboard = () => {
 
   const handleFolderClick = async (folder: Folder) => {
     try {
-      const res = await http.get(`/decks/${folder.id}`);
+      const res = await http.get(`/deck/get-deck/${folder.id}`);
+      console.log(res)
       setSelectedFolderDecks(res.data?.decks || []);
       setIsFolderPopupVisible(true);
     } catch (err) {

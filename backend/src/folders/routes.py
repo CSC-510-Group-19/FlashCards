@@ -62,6 +62,7 @@ def getfolders():
     args = request.args
     userId = args and args['userId']
     try:
+        #db.child("folder_deck").order_by_child("folderId").equal_to(folder_id).get()['progress']
         user_folders = db.child("folder").order_by_child("userId").equal_to(userId).get()
         folders = []
         for folder in user_folders.each():
@@ -103,7 +104,7 @@ def createfolder():
         folder_ref = db.child("folder").push({
             "name": folder_name,
             "userId": user_id,
-            "progress": 0
+            "addess": 0
         })
         new_folder_id = folder_ref['name']  # Retrieve auto-generated ID
         print("progress is 0?")
@@ -182,23 +183,30 @@ def updatefolder(id):
 def updatefolder_progress(folder_id):
     '''This method is called when a quiz is taken and a folder's progress bar should update.'''
     try:
-        folder_obj = db.child("folder_deck").order_by_child("folderId").equal_to(folder_id).get()
+        print('******')
         deck_list = []
-        for folders in folder_obj.each():
-            obj = folders.val()
-            obj['id'] = folders.key()  # Optional: if you need the deck ID
-            deck_list.append(obj["id"])
-        print("deck_list", deck_list)
+        folder_deck_ref = db.child("folder_deck").order_by_child("folderId").equal_to(folder_id).get()
+        for fd in folder_deck_ref.each():
+            if fd.val().get('deckId') is None:
+                continue
+            deck_list.append(fd.val().get('deckId'))
+        print(deck_list)
+        # folder_obj = db.child("folder_deck").order_by_child("folderId").equal_to(folder_id).get()
+        # deck_list = []
+        # for folders in folder_obj.each():
+        #     obj = folders.val()
+        #     obj['id'] = folders.key()  # Optional: if you need the deck ID
+        #     deck_list.append(obj["id"])
+        # print("deck_list", deck_list)
         # print(len(deck_list))
         deck_list_length = len(deck_list)
         total = 0
         for deck in deck_list:
             deck_obj = db.child("deck").child(deck).get()
+            print(deck_obj.val())
             # get_user_score(deckId, userId)
-            deck_progress = deck_obj.val()["progress"]
+            deck_progress = deck_obj.val()["goalProgress"]
             print("deck_progress " + str(deck_progress))
-            if(deck_progress > 1 or deck_progress < 0):
-                deck_progress = 0
             total = total + deck_progress
             print("new total: " + str(total))
         
@@ -211,12 +219,18 @@ def updatefolder_progress(folder_id):
             folder_progress = total / len(deck_list)
         print("folder name " +  str(folder_id) + " folder progress " + str(folder_progress))
 
-        db.child("folder_deck").push({
-            "folderId": folder_id,
-            "progress": folder_progress
-        })
+        # TODO: Check that db calls are made correctly
+        # db.child("folder_deck").child(folder_id).update({
+        #     "progress": folder_progress
+        # })
+
+        # db.child("folder").child(folder_id).update({
+        #     "progress": folder_progress
+        # })
+        
 
         print("folder progress stored: " + str(db.child("folder_deck").order_by_child("folderId").equal_to(folder_id).get()['progress']))
+        print("folder progress stored: " + str(db.child("folder").order_by_child("folderId").equal_to(folder_id).get()['progress']))
 
         return jsonify(
             message='Folder Progress updated successfully',
@@ -268,6 +282,30 @@ def adddecktofolder():
     except Exception as e:
         return jsonify(
             message=f"Failed to add deck to folder: {e}",
+            status=500
+        ), 500
+    
+@folder_bp.route('/deck/get-deck/<folder_id>', methods=['GET'])
+@cross_origin(supports_credentials=True)
+def get_deck_from_folder(folder_id):
+    '''Return decks in a folder'''
+    try:
+        deck_list = []
+        folder_deck_ref = db.child("folder_deck").order_by_child("folderId").equal_to(folder_id).get()
+        for fd in folder_deck_ref.each():
+            if fd.val().get('deckId') is None:
+                continue
+            deck_list.append(fd.val().get('deckId'))
+        print(deck_list)
+
+        return jsonify(
+            decks=deck_list,
+            message='Deck returned',
+            status=201
+        ), 201
+    except Exception as e:
+        return jsonify(
+            message=f"Failed to returned deck: {e}",
             status=500
         ), 500
 

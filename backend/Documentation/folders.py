@@ -169,6 +169,31 @@ def adddecktofolder():
             message=f"Failed to add deck to folder: {e}",
             status=500
         ), 500
+    
+@folder_bp.route('/deck/get-deck', methods=['GET'])
+@cross_origin(supports_credentials=True)
+def get_deck_from_folder():
+    '''Return decks in a folder'''
+    try:
+        data = request.get_json()
+        folder_id = data['folderId']
+
+        deck_list = db.child("folder").order_by_child("deckId").equal_to(folder_id).get()
+        decks = []
+        for deck in deck_list.each():
+            obj = deck.val()
+            obj['id'] = deck.key()
+            decks.append(obj['id'])
+
+        return jsonify(
+            message='Deck returned',
+            status=201
+        ), 201
+    except Exception as e:
+        return jsonify(
+            message=f"Failed to returned deck: {e}",
+            status=500
+        ), 500
 
 
 @folder_bp.route('/folder/remove-deck', methods=['DELETE'])
