@@ -62,22 +62,31 @@ FlashCards is a spaced repetition learning platform to <b>create</b>, <b>memoriz
 ## Current Screens
 
 <p style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; ">
-  <img src="./images/dashboard.png" alt="Demo Screens 1" width="250px" height="250px style="object-fit: cover;" />
-  <img src="./images/deck to folder.png" alt="Demo Screens 2" width="250px" height="250px style="object-fit: cover;" />
-  <img src="./images/decks in folders.png" alt="Demo Screens 3" width="250px" height="250px style="object-fit: cover;" />
-  <img src="./images/practice deck.png" alt="Demo Screens 4" width="250px" height="250px style="object-fit: cover;" />
-  <img src="./images/quiz.png" alt="Demo Screens 5" width="250px" height="250px style="object-fit: cover;" />
-  <img src="./images/quiz complete.png" alt="Demo Screens 6" width="250px" height="250px style="object-fit: cover;" />
-  <img src="./images/leaderboard.png" alt="Demo Screens 7" width="250px" height="250px style="object-fit: cover;" />
+  <img src="./images/dashboard.png" alt="Demo Screens 1" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/deck to folder.png" alt="Demo Screens 2" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/decks in folders.png" alt="Demo Screens 3" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/practice deck.png" alt="Demo Screens 4"width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/quiz.png" alt="Demo Screens 5" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/quiz complete.png" alt="Demo Screens 6" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/leaderboard.png" alt="Demo Screens 7" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/Streaks_SS.png" alt="Demo Screens 8" width="444.444px" height="250px style="object-fit: cover;"
+  <img src="./images/StudyGoals_SS.png" alt="Demo Screens 9" width="444.444px" height="250px style="object-fit: cover;"
 </p>
 
 <!-- ## Future Roadmap [See here](https://github.com/users/JohnDamilola/projects/1) -->
 
-### Phase 1:
+## Suggested Future Features (see [LINK TO POSTER] for more information)
+- [ ] Add a folder deletion function
+- [ ] Improve API Authentication
+- [ ] Improve Sign-up and Log-in Options
+- [ ] Use LLM for Automatic Flashcard Creation
+- [ ] Add More Study Goals
+
+<!-- ### Phase 1:
 - [ ] Add a dashboard providing insights on study habits, quiz results over time, and areas needing improvement, helping users to plan their study strategy.
 - [ ] Enable collaborative learning by enabling users to share flashcards seamlessly with friends, classmates, or study groups
 - [ ] Progress tracking by subject and review options like retrying incorrect questions
-- [ ] Chrome Extension feature that enables users to highlight text on websites or online PDFs and instantly create flashcards from their selections.
+- [ ] Chrome Extension feature that enables users to highlight text on websites or online PDFs and instantly create flashcards from their selections.-->
 
 ## Contributions to the Project
 Please refer to the [Contributing.md](https://github.com/Group21-SWE/FlashCards/blob/main/Contributing.md) if you want to contrbute to the FlashCards source code. Follow all the guidelines mentioned and raise a pull request for the developers to review before the code goes to the main source code.
