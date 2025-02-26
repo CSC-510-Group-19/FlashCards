@@ -141,7 +141,7 @@ def updatefolders():
             updatefolder_progress(obj['id'])
 
             obj['decks_count'] = len(obj['decks'])
-            folders.append(obj)
+            # folders.append(obj)
         
         return jsonify(
             folders=folders,
@@ -187,7 +187,7 @@ def updatefolder_progress(folder_id):
         for folders in folder_obj.each():
             obj = folders.val()
             obj['id'] = folders.key()  # Optional: if you need the deck ID
-            deck_list.append(obj["deckId"])
+            deck_list.append(obj["id"])
         print("deck_list", deck_list)
         # print(len(deck_list))
         deck_list_length = len(deck_list)
@@ -308,12 +308,17 @@ def get_decks_for_folder(folder_id):
             obj = folders.val()
             print("obj: ", obj)
             obj['id'] = folders.key()  # Optional: if you need the deck ID
-            deck_list.append(obj["deckId"])
+            print(obj['id'])
+            deck_list.append(obj["id"])
         print("deck_list", deck_list)
         deck_title = []
         for deck in deck_list:
             deck_obj = db.child("deck").child(deck).get()
-            deck_title.append( {"id": deck, "title": deck_obj.val()["title"]} )
+            print(deck_obj)
+            print(deck_obj.key())
+            title = deck_obj.val()["title"]
+            print(title)
+            deck_title.append( {"id": deck, "title": title} )
 
         return jsonify(
             decks=deck_title,
