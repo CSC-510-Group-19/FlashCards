@@ -189,3 +189,142 @@ class TestFolders(unittest.TestCase):
         assert response.status_code == 500
         response_data = json.loads(response.data)
         assert "An error occurred: Retrieval failed" in response_data['message']
+
+    @patch('src.folders.routes.db')
+    def test_get_decks_for_folder_no_decks(self, mock_db):
+        '''Test retrieval of decks for a folder with no decks'''
+        folder_id = "folder_id"
+        
+        # Mock the folder_deck response for folder decks query
+        mock_db.child.return_value.order_by_child.return_value.equal_to.return_value.get.return_value.each.return_value = []
+
+        response = self.app.get(f'/decks/{folder_id}')
+        assert response.status_code == 200
+        response_data = json.loads(response.data)
+        assert len(response_data['decks']) == 0
+    
+    @patch('src.folders.routes.db')
+    def test_get_decks_for_folder_no_folder(self, mock_db):
+        '''Test retrieval of decks for a non-existent folder'''
+        folder_id = "non_existent_folder"
+        
+        # Mock the folder_deck response for folder decks query
+        mock_db.child.return_value.order_by_child.return_value.equal_to.return_value.get.return_value.each.return_value = []
+
+        response = self.app.get(f'/decks/{folder_id}')
+        assert response.status_code == 200
+        response_data = json.loads(response.data)
+        assert len(response_data['decks']) == 0
+    
+    @patch('src.folders.routes.db')
+    def test_get_decks_for_folder_invalid_folder_id(self, mock_db):
+        '''Test retrieval of decks for an invalid folder ID'''
+        folder_id = "invalid_folder_id"
+        
+        # Mock the folder_deck response for folder decks query
+        mock_db.child.return_value.order_by_child.return_value.equal_to.return_value.get.return_value.each.return_value = []
+
+        response = self.app.get(f'/decks/{folder_id}')
+        assert response.status_code == 200
+        response_data = json.loads(response.data)
+        assert len(response_data['decks']) == 0
+    
+    @patch('src.folders.routes.db')
+    def test_get_decks_for_folder_no_user_id(self, mock_db):
+        '''Test retrieval of decks for a folder without userId'''
+        response = self.app.get(f'/decks/')
+        assert response.status_code == 500
+
+    @patch('src.folders.routes.db')
+    def test_deck_progress_uninitialized(self, mock_db):
+        '''Test deck progress when it is uninitialized'''
+        folder_id = "folder_id"
+        deck_id = "deck_id"
+        
+        # Mock the folder_deck response for folder decks query
+        mock_db.child.return_value.order_by_child.return_value.equal_to.return_value.get.return_value.each.return_value = []
+
+        response = self.app.get(f'/decks/{folder_id}/{deck_id}')
+        assert response.status_code == 200
+        response_data = json.loads(response.data)
+        assert response_data['progress'] == 0
+
+    @patch('src.folders.routes.db')
+    def test_folder_progress_uninitialized(self, mock_db):
+        '''Test folder progress when it is uninitialized'''
+        folder_id = "folder_id"
+        
+        # Mock the folder_deck response for folder decks query
+        mock_db.child.return_value.order_by_child.return_value.equal_to.return_value.get.return_value.each.return_value = []
+
+        response = self.app.get(f'/folders/{folder_id}')
+        assert response.status_code == 200
+        response_data = json.loads(response.data)
+        assert response_data['progress'] == 0
+    
+    @patch('src.folders.routes.db')
+    def test_folder_progress_success(self, mock_db):
+        '''Test folder progress when it is successfully initialized'''
+        folder_id = "folder_id"
+        
+        # Mock the folder_deck response for folder decks query
+        mock_db.child.return_value.order_by_child.return_value.equal_to.return_value.get.return_value.each.return_value = []
+
+        # Mock the deck progress response
+        mock_db.child.return_value.child.return_value.get.return_value.val.return_value = {"progress": 50}
+
+        response = self.app.get(f'/folders/{folder_id}')
+        assert response.status_code == 200
+        response_data = json.loads(response.data)
+        assert response_data['progress'] == 50
+    
+    @patch('src.folders.routes.db')
+    def test_deck_progress_success(self, mock_db):
+        '''Test deck progress when it is successfully initialized'''
+        folder_id = "folder_id"
+        deck_id = "deck_id"
+        
+        # Mock the folder_deck response for folder decks query
+        mock_db.child.return_value.order_by_child.return_value.equal_to.return_value.get.return_value.each.return_value = []
+
+        # Mock the deck progress response
+        mock_db.child.return_value.child.return_value.get.return_value.val.return_value = {"progress": 50}
+
+        response = self.app.get(f'/decks/{folder_id}/{deck_id}')
+        assert response.status_code == 200
+        response_data = json.loads(response.data)
+        assert response_data['progress'] == 50
+    
+    @patch('src.folders.routes.db')
+    def test_get_decks_in_folder_equals_num_decks(self, mock_db):
+        '''Test when the number of decks shown in a folder accurately reflects the number of decks in the folder'''
+        folder_id = "folder_id"
+        
+        # Mock the folder_deck response for folder decks query
+        mock_db.child.return_value.order_by_child.return_value.equal_to.return_value.get.return_value.each.return_value = []
+
+        # Mock the deck list response
+        mock_db.child.return_value.child.return_value.get.return_value.val.return_value = {"decks": ['deck A ', 'deck B']}
+
+        # Make the API call
+        response = self.app.get(f'/decks/{folder_id}')
+        assert response.status_code == 200
+        response_data = json.loads(response.data)
+        assert response_data['decks'] == ['deck A ', 'deck B']
+    
+    @patch('src.folders.routes.db')
+    def test_get_decks_in_folder_fail(self, mock_db):
+        '''Test when the number of decks shown in a folder does not accurately reflect the number of decks in the folder'''
+        folder_id = "folder_id"
+        
+        # Mock the folder_deck response for folder decks query
+        mock_db.child.return_value.order_by_child.return_value.equal_to.return_value.get.return_value.each.return_value = []
+
+        # Mock the deck list response
+        mock_db.child.return_value.child.return_value.get.return_value.val.return_value = {"decks": ['deck A ', 'deck B']}
+
+        # Make the API call
+        response = self.app.get(f'/decks/{folder_id}')
+        assert response.status_code == 500
+        response_data = json.loads(response.data)
+        assert response_data['decks'] != ['deck A ', 'deck B']
