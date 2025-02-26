@@ -52,6 +52,7 @@ export default function Quiz({ cards }: QuizProps) {
         // Quiz is finished; call updateLeaderboard here
         setIsQuizFinished(true);
         updateLeaderboard(score + (isCorrect ? 1 : 0), incorrectAnswers + (isCorrect ? 0 : 1));
+        updateDeckProgress(score + (isCorrect ? 1 : 0), incorrectAnswers + (isCorrect ? 0 : 1));
       }
     }, 1000);
   };
@@ -82,6 +83,35 @@ export default function Quiz({ cards }: QuizProps) {
       }
     }
   };
+
+    // Update deck progress
+    const updateDeckProgress = async (finalScore: number, finalIncorrectAnswers: number) => {
+      const flashCardUser = window.localStorage.getItem("flashCardUser");
+      const { localId = "", email = "" } = flashCardUser ? JSON.parse(flashCardUser) : {};
+  
+      if (localId && email) {
+        try {
+          // Fetch the user's current score for this deck
+          const response = await http.get(`/deck/${id}/user-score/${localId}`);
+          const existingScore = response.data?.score["correct"]; // Assuming the score is returned here
+          // Only update if the new score is higher than the existing score
+          await http.post('/deck/${id}/user-score/${localId}', {
+            deckId: id
+          });
+          await http.post('/folders/all/update', { userId: localId } );
+          if (finalScore > existingScore || (response.data.score["correct"] === 0 && response.data.score["incorrect"] === 0)) {
+            console.log("inside")
+            // if deck is in a folder -> update progress on folder
+            // await http.post('/folder/update-progress/<id>', {
+
+            // });
+
+          }
+        } catch (error) {
+          console.error("Error updating folders:", error);
+        }
+      }
+    };
 
   const restartQuiz = () => {
     setCurrentCardIndex(0);

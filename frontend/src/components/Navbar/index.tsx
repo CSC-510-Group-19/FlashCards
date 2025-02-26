@@ -2,7 +2,7 @@ import "./styles.scss";
 import { useState } from "react";
 import { Modal, Input, Button } from "antd";
 import Swal from "sweetalert2";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import http from "utils/api";
 
 interface NavbarProps {
@@ -28,7 +28,7 @@ const Navbar = ({ isDashboard, onFolderCreated }: NavbarProps) => {
     }
 
     try {
-      await http.post("/folder/create", { name: newFolderName, userId: localId });
+      await http.post("/folder/create", { name: newFolderName, userId: localId});
       Swal.fire("Folder Created Successfully!", "", "success");
       setIsModalVisible(false);
       setNewFolderName("");

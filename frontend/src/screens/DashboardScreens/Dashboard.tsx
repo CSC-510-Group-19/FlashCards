@@ -9,6 +9,13 @@ import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import Navbar from "../../components/Navbar";
 import activeStreakImg from "../../assets/images/streak-active.png";
 import inactiveStreakImg from "../../assets/images/streak-inactive.png";
+import { render } from "react-dom";
+import {
+  CircularProgressbar,
+  CircularProgressbarWithChildren,
+  buildStyles
+} from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 
 interface Deck {
   id: string;
@@ -20,12 +27,14 @@ interface Deck {
   lastOpened?: string; // Optional for recent decks
   folderId?: string;    // Optional to track folder assignment
   streak?: number;
+  progress?: number; 
 }
 
 interface Folder {
   id: string;
   name: string;
   decks: Deck[];
+  progress?: number;
 }
 
 const Dashboard = () => {
@@ -39,6 +48,9 @@ const Dashboard = () => {
   // for streaks
   const [streak, setStreak] = useState(10);
   const isActive = streak > 0; // Streak is active if it's greater than 0
+
+  // for progress tracking
+  const [progress, setProgress] = useState(0);
 
 
   // Refs for sliders
@@ -119,7 +131,9 @@ const Dashboard = () => {
   const fetchFolders = async () => {
     try {
       const res = await http.get("/folders/all", { params: { userId: localId } });
+      console.log(res)
       setFolders(res.data?.folders || []);
+      await http.post("/folders/all/update", { userId: localId })
     } catch (err) {
       console.error("Error fetching folders:", err);
     }
@@ -132,11 +146,14 @@ const Dashboard = () => {
     fetchDecks(); // Refetch the decks to update both 'decks' and 'recentDecks'
   };
 
+  // const updateDeckProgress = async ()
+
 
 
   const handleFolderClick = async (folder: Folder) => {
     try {
-      const res = await http.get(`/decks/${folder.id}`);
+      const res = await http.get(`/deck/get-deck/${folder.id}`);
+      console.log(res)
       setSelectedFolderDecks(res.data?.decks || []);
       setIsFolderPopupVisible(true);
     } catch (err) {
@@ -235,8 +252,15 @@ const Dashboard = () => {
                   <div className="folder-container" onClick={() => handleFolderClick(folder)}>
                     <h5>{folder.name}</h5>
                     <p>{folder.decks.length > 0 ? `${folder.decks.length} deck(s)` : null}</p>
-                    <p>{folder.decks.length === 0 ? `${folder.decks.length} deck(s)` : null}</p>
-                  </div>
+                    {
+                      folder.decks.length > 0 ?
+                      <div className="menu" style={{width: "100px", height: "100px"}}>
+                        <CircularProgressbar className="progress-circle" value={folder.progress || 0} text={`${folder.progress || 0}%`} />
+                      </div>
+                      : null
+                    }
+                      <p>{folder.decks.length === 0 ? `${folder.decks.length} deck(s)` : null}</p>
+                    </div>
                 </div>
               ))
             )}
