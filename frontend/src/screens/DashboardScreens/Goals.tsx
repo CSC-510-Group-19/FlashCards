@@ -1,14 +1,10 @@
-import { Card, Popconfirm, Button, Modal } from "antd";
+import { Card } from "antd";
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import EmptyImg from "assets/images/empty.svg";
-import { PropagateLoader } from "react-spinners";
 import http from "utils/api";
 import Swal from "sweetalert2";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import Navbar from "../../components/Navbar";
-import activeStreakImg from "../../assets/images/streak-active.png";
-import inactiveStreakImg from "../../assets/images/streak-inactive.png";
 
 interface Deck {
   id: string;
@@ -138,41 +134,6 @@ const StudyHabits = () => {
     fetchDecks(); // Refetch the decks to update both 'decks' and 'recentDecks'
   };
 
-  const handleFolderClick = async (folder: Folder) => {
-    try {
-      const res = await http.get(`/decks/${folder.id}`);
-      setSelectedFolderDecks(res.data?.decks || []);
-      setIsFolderPopupVisible(true);
-    } catch (err) {
-      console.error("Error fetching folders:", err);
-    }
-    setIsFolderPopupVisible(true);
-  };
-
-  const navigateToDeck = (deckId: string, deckTitle: string) => {
-    navigate(`/deck/${deckId}/practice?title=${encodeURIComponent(deckTitle)}`);
-  };
-
-  const handleDeleteDeck = async (id: string) => {
-    try {
-      await http.delete(`/deck/delete/${id}`);
-      Swal.fire("Deck Deleted Successfully!", "", "success").then(() => fetchDecks());
-    } catch (err) {
-      Swal.fire("Deck Deletion Failed!", "", "error");
-    }
-  };
-
-  const handleAddDeckToFolder = async (deckId: string, folderId: string) => {
-    try {
-      await http.post("/deck/add-deck", { deckId, folderId });
-      fetchDecks();
-      fetchFolders();
-      Swal.fire("Deck added to folder!", "", "success");
-    } catch (err) {
-      Swal.fire("Failed to add deck to folder!", "", "error");
-    }
-  };
-
   // Update arrows visibility based on scroll position
   const updateArrowsVisibilityLibrary = () => {
     if (sliderRefLibrary.current) {
@@ -190,13 +151,6 @@ const StudyHabits = () => {
     }
   };
 
-  const scrollLibrary = (direction: "left" | "right") => {
-    if (sliderRefLibrary.current) {
-      const scrollAmount = direction === "left" ? -300 : 300;
-      sliderRefLibrary.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-    }
-  };
-
   const scrollRecent = (direction: "left" | "right") => {
     if (sliderRefRecent.current) {
       const scrollAmount = direction === "left" ? -300 : 300;
@@ -204,71 +158,14 @@ const StudyHabits = () => {
     }
   };
 
-  const studyGoals = [
-    "Study for 20 minutes",
-    "Review 3 different decks",
-    "Add 5 new flashcards to any deck",
-    "Review your mistakes",
-    "Take a quiz in any deck"
-  ]
-
-  const [goal, setGoal] = useState<string>("");
   const [completed, setCompleted] = useState<boolean>(false);
 
   useEffect(() => {
-    const savedGoal = localStorage.getItem("dailyGoal");
-    const savedDate = localStorage.getItem("goalDate");
-
-    const today = new Date().toDateString();
-
-    if (!savedGoal || savedDate !== today) {
-      const newGoal = studyGoals[Math.floor(Math.random() * studyGoals.length)];
-      localStorage.setItem("dailyGoal", newGoal);
-      localStorage.setItem("goalDate", today);
-      setGoal(newGoal);
-    } else {
-      setGoal(savedGoal);
-    }
-
     const savedCompletion = localStorage.getItem("goalCompleted");
     if (savedCompletion == "true") {
       setCompleted(true);
     }
   }, []);
-
-  const handleComplete = () => {
-    setCompleted(true);
-    localStorage.setItem("goalCompleted", "true");
-  };
-
-  const completeGoal = async (deckId: string) => {
-    try {
-      await http.patch(`/deck/goal/${deckId}`);
-      setDeckGoals((prevGoals) => ({
-        ...prevGoals,
-        [deckId]: { ...prevGoals[deckId], completed: true },
-      }));
-    } catch (err) {
-      console.error(`Error completing goal for deck ${deckId}:`, err);
-    }
-  };
-
-  const updateGoalProgress = async (deckId: string, progress: number) => {
-    try {
-      await http.patch(`/deck/goal/${deckId}`, { progress });
-      setDeckGoals((prevGoals) => ({
-        ...prevGoals,
-        [deckId]: {
-          ...prevGoals[deckId],
-          progress: prevGoals[deckId]?.progress + progress,
-          completed: prevGoals[deckId]?.progress + progress >= prevGoals[deckId]?.target,
-        },
-      }));
-    } catch (err) {
-      console.error(`Error updating goal for deck ${deckId}:`, err);
-    }
-  };
-
 
   return (
     <div className="dashboard-page dashboard-commons">
@@ -292,8 +189,8 @@ const StudyHabits = () => {
           {/* Goals Section */}
           <div className="goal-section">
             <div className="deck-container">
-              {decks.map(({ id, title, description, visibility, cards_count, streak, }) => (
-                <div className="deck-goal">
+              {decks.map(({ id, title, description, visibility, cards_count, streak }) => (
+                <div className="deck-goal" key={id}>
                   <div className="align-items-center">
                     <Link to={`/deck/${id}/practice`} onClick={() => updateLastOpened(id)}>
                       <h5>{title}</h5>
@@ -306,7 +203,6 @@ const StudyHabits = () => {
             </div>
           </div>
 
-          {/* Deck Goals Section */}
           <div className="deck-slider" ref={sliderRefLibrary}>
 
           </div>
@@ -354,25 +250,6 @@ const StudyHabits = () => {
             }
           </div>
 
-          {/* Folder Decks Modal */}
-          {/* <Modal
-            title="Folder Decks"
-            open={isFolderPopupVisible}
-            onCancel={() => setIsFolderPopupVisible(false)}
-            footer={null}
-          >
-            {selectedFolderDecks.length === 0 ? (
-              <p>No decks in this folder.</p>
-            ) : (
-              selectedFolderDecks.map(({ id, title }, index) => (
-                <div key={index}>
-                  <Button className="folder-deck-button" onClick={() => navigateToDeck(id, title)}>
-                    {title}
-                  </Button>
-                </div>
-              ))
-            )}
-          </Modal>*/}
         </div>
       </section >
     </div >
