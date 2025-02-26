@@ -33,9 +33,11 @@ async function invokeAPI() {
 
     const form = document.getElementById('form');
     if (form) {
+        const submissionMessage = document.querySelector('#submission-message');
         form.addEventListener('submit', function(event) {
             event.preventDefault();
             addCard();
+            submissionMessage.classList.add('show');
         });
     } else {
         console.error('Form not found!');

@@ -136,5 +136,48 @@ class TestAuth(unittest.TestCase):
         response_data = json.loads(response.data.decode())
         self.assertEqual(response_data['message'], 'Registered Successfully')
 
+    def test_login_missing_fields(self):
+        '''Test logging in with missing fields'''
+        response = self.client.post(
+            '/login',
+            data=json.dumps({
+                'email': 'aaronadb@gmail.com'
+            }),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 400)
+        response_data = json.loads(response.data.decode())
+        self.assertEqual(response_data['message'], 'Missing required fields')
+
+    def test_signup_invalid_password(self):
+        '''Test signing up with an invalid password'''
+        response = self.client.post(
+            '/signup',
+            data=json.dumps({
+                'email': 'newuser@gmail.com',
+                'password': '123'
+            }),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 400)
+        response_data = json.loads(response.data.decode())
+        self.assertEqual(response_data['message'], 'Invalid password')
+
+    def test_signup_duplicate_email(self):
+        '''Test signing up with a duplicate email'''
+        with patch('src.auth.routes.auth') as mock_auth:
+            mock_auth.create_user_with_email_and_password.side_effect = Exception("Email already exists")
+            response = self.client.post(
+                '/signup',
+                data=json.dumps({
+                    'email': 'aaronadb@gmail.com',
+                    'password': 'flashcards123'
+                }),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 409)
+            response_data = json.loads(response.data.decode())
+            self.assertEqual(response_data['message'], 'Email already exists')
+
 if __name__ == "__main__":
     unittest.main()
