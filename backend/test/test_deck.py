@@ -477,14 +477,81 @@ class TestDeck(unittest.TestCase):
             response = self.app.patch("/deck/goal/Test", data=json.dumps(payload), content_type="application/json")
             self.assertIn(response.status_code, [400, 422])  # Expecting a bad request or unprocessable entity
     
-        
-    
-        
+    @patch('src.deck.routes.db')
+    def test_deck_delete_route(self, mock_cards_db, mock_deck_db, mock_auth):
+        '''Test the deck/delete/<id> route of our app'''
+        responses = []
+        response_1 = self.client.get('/deck/all?localId=Test')
+        test_decks = response_1['decks']
+        for test_deck in test_decks:
+            test_deck_id = test_deck['id']
+            response = self.client.post(
+                '/deck/delete/' + test_deck_id,
+                content_type='application/json'
+            )
+            responses.append(response)
+        assert 500 not in responses
 
-        
-        
-    
-    
+    def test_create_deck_missing_fields(self):
+        '''Test creating a deck with missing fields'''
+        response = self.app.post(
+            '/deck/create',
+            data=json.dumps({
+                'localId': 'Test',
+                'title': '',
+                'description': 'This is a test deck',
+                'visibility': 'public'
+            }),
+            content_type='application/json'
+        )
+        assert response.status_code == 400
+        response_data = json.loads(response.data)
+        assert response_data['message'] == 'Missing required fields'
+
+    def test_update_deck_invalid_data(self):
+        '''Test updating a deck with invalid data'''
+        response = self.app.patch(
+            '/deck/update/Test',
+            data=json.dumps({
+                'localId': 'Test',
+                'title': '',
+                'description': 'This is a test deck',
+                'visibility': 'public'
+            }),
+            content_type='application/json'
+        )
+        assert response.status_code == 400
+        response_data = json.loads(response.data)
+        assert response_data['message'] == 'Invalid data provided'
+
+    def test_delete_deck_non_existent(self):
+        '''Test deleting a non-existent deck'''
+        response = self.app.delete('/deck/delete/non_existent_deck')
+        assert response.status_code == 404
+        response_data = json.loads(response.data)
+        assert response_data['message'] == 'Deck not found'
+
+    def test_get_leaderboard_no_entries(self):
+        '''Test fetching the leaderboard for a deck with no entries'''
+        with patch('src.deck.routes.db.child') as mock_db:
+            mock_db.return_value.child.return_value.get.return_value = None
+            response = self.app.get('/deck/TestDeck/leaderboard')
+            assert response.status_code == 200
+            response_data = json.loads(response.data)
+            assert response_data['leaderboard'] == []
+
+    def test_update_leaderboard_missing_fields(self):
+        '''Test updating the leaderboard with missing fields'''
+        response = self.app.post(
+            '/deck/TestDeck/update-leaderboard',
+            data=json.dumps({
+                'userId': 'Test',
+            }),
+            content_type='application/json'
+        )
+        assert response.status_code == 400
+        response_data = json.loads(response.data)
+        assert response_data['message'] == 'Missing required fields'
         
 if __name__=="__main__":
     unittest.main()
