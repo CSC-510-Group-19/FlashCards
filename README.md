@@ -6,10 +6,10 @@
   />
 </p>
 <p align="center">
-  <a href="https://github.com/JohnDamilola/FlashCards/blob/main/LICENSE">
+  <a href="https://github.com/Group21-SWE/FlashCards/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/johndamilola/flashcards?style=plastic"></a>
   <img src="https://img.shields.io/github/languages/count/johndamilola/flashcards">
-  <a href="https://github.com/JohnDamilola/FlashCards/graphs/contributors" alt="Contributors">
+  <a href="https://github.com/Group21-SWE/FlashCards/graphs/contributors" alt="Contributors">
 <img src="https://img.shields.io/github/contributors/JohnDamilola/FlashCards?style=plastic"/> </a>
 
 <a href="https://github.com/WolfByteCollective/FlashCards/actions/workflows/Application.yml" alt="Python application">
@@ -26,11 +26,12 @@
 <img src="https://img.shields.io/github/repo-size/JohnDamilola/FlashCards?color=brightgreen"/> </a>
 <img src="https://img.shields.io/github/languages/top/JohnDamilola/Flashcards?style=plastic">
 <img src="https://img.shields.io/tokei/lines/github/johndamilola/flashcards?style=plastic">
-<a href="https://github.com/JohnDamilola/FlashCards/issues">
+<a href="https://github.com/Group21-SWE/FlashCards/issues">
   <img src="https://img.shields.io/github/issues-raw/johndamilola/flashcards?style=plastic"></a>
 <a href="https://img.shields.io/github/release/JohnDamilola/FlashCards?color=brightblue" alt="Release">
 <img src="https://img.shields.io/github/release/JohnDamilola/FlashCards?color=brightblue"/> </a>
 </p>
+
 ## Description
 Are you a student and having trouble preparing for tests and exams? Look no further. FlashCards also helps you memorize all that hard-to-remember information with online flashcards so that you ace your exams!
 
