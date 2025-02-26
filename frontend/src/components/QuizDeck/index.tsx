@@ -77,6 +77,7 @@ export default function Quiz({ cards }: QuizProps) {
             incorrect: finalIncorrectAnswers, // Pass the calculated final incorrect answers
           });
         }
+        
       } catch (error) {
         console.error("Error updating leaderboard:", error);
       }
@@ -119,7 +120,17 @@ export default function Quiz({ cards }: QuizProps) {
     setIncorrectAnswers(0);
   };
 
+  const updateQuizGoal = async () => {
+    try {
+      await http.patch(`/deck/quizCompleted/${id}`);
+      console.log(`Quiz goal marked as completed for deck ${id}`);
+    } catch (err) {
+      console.error(`Error updating quiz goal for deck ${id}:`, err);
+    }
+  };
+
   if (isQuizFinished) {
+    updateQuizGoal();
     return (
       <div className="quiz-summary">
         <h2>Quiz Complete!</h2>

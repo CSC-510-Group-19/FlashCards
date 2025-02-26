@@ -131,6 +131,7 @@ const CreateCards = () => {
       cards,
     };
     setIsSubmitting(true);
+    await http.patch(`/deck/goal/${id}`, { progress: cards.length });
     await http
       .post(`/deck/${id}/card/create`, payload)
       .then((res) => {

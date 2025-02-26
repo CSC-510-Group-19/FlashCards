@@ -8,9 +8,71 @@ import "./styles.scss";
 
 import { Pagination, Navigation } from "swiper";
 import ReactCardFlip from "react-card-flip";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
+import http from "utils/api";
+import { Progress } from "antd";
 
 export default function Flashcard({cards}: any) {
+  const { id } = useParams();
+  const [studyTime, setStudyTime] = useState(0);
+  const [activeGoal, setActiveGoal] = useState("");
+
+  useEffect(() => {
+
+    const fetchGoal = async () => {
+      try {
+        const res = await http.get(`/deck/goal/${id}`);
+        setActiveGoal(res.data.goal || "");
+      } catch (err) {
+        console.error("Error fetching goal:", err);
+      }
+    };
+    updateStreak();
+    fetchGoal();
+  }, [id]);
+  useEffect(() => {
+    if (activeGoal !== "Study this deck for 20 minutes") return;
+
+    const startTime = Date.now();
+    
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      setStudyTime(elapsed);
+
+      // Send PATCH request every 5 seconds
+      if (elapsed % 5 === 0) {
+        updateStudyGoal(5);
+      }
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      updateStudyGoal(studyTime);
+    };
+  }, [activeGoal]);
+
+  const updateStudyGoal = async (elapsedTime: number) => {
+    try {
+      await http.patch(`/deck/goal/${id}`, {
+        goalType: "Study this deck for 20 minutes", // Send goal type
+        progress: elapsedTime,
+      });
+      console.log("Study goal updated:", elapsedTime);
+    } catch (err) {
+      console.error("Error updating study goal:", err);
+    }
+  };
+
+  const updateStreak = async () => {
+    try {
+      await http.patch(`/deck/streak/${id}`, {});
+      console.log("Streak updated successfully");
+    } catch (err) {
+      console.error("Error updating streak:", err);
+    }
+  };
+
   return (
     <>
       <Swiper

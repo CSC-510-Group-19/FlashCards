@@ -2,12 +2,14 @@
     padding: 20px 0px;
     background: #FFFAF5;
     min-height: calc(100vh - 75px);
+
     .flash-card__list {
         p.title {
             font-size: 16px;
             color: #000;
             font-weight: 600;
         }
+
         .flash-card__item {
             background: #fff;
             padding: 30px 20px;
@@ -15,24 +17,30 @@
             cursor: default;
             border-radius: 12px;
             box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+            display: flex;
+
             h5 {
                 margin-bottom: 8px;
                 font-weight: 600;
                 color: #221daf;
             }
+
             .visibility-status {
                 color: #757575;
                 font-weight: 500;
             }
+
             i {
                 font-size: 20px;
                 font-weight: 400;
             }
+
             // .menu {
 
             // }
             p {
                 color: #222;
+
                 &.description {
                     font-size: 16px;
                     margin-bottom: 4px;
@@ -40,6 +48,7 @@
                     overflow: hidden;
                     text-overflow: ellipsis;
                 }
+
                 &.items-count {
                     font-size: 14px;
                     font-weight: 600;
@@ -48,6 +57,7 @@
                     margin-bottom: 20px;
                 }
             }
+
             .bottom-section {
                 p {
                     margin-bottom: 0px;
@@ -55,8 +65,10 @@
                     text-align: right;
                 }
             }
+
             .menu {
                 padding: 20px 0px 0px;
+
                 .btn {
                     padding: 0px;
                     font-size: 14px;
@@ -72,6 +84,7 @@
             }
         }
     }
+
     .empty-pane {
         p {
             font-size: 20px;
@@ -88,21 +101,39 @@
         border-radius: 12px;
         padding: 30px 20px;
         margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+
         h3 {
             color: #fff;
             font-family: 'HW Nuckle Trial';
             margin-bottom: 4px;
         }
+
         p {
             font-size: 12px;
             color: #fff;
             margin-bottom: 0px;
         }
+
         &.practice-deck {
             padding-top: 13px;
+
             .back-icon {
                 cursor: pointer;
             }
+        }
+    }
+
+    .welcome-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        color: white;
+
+        .welcome-text {
+            flex: 1;
         }
     }
 }
@@ -111,6 +142,7 @@
     .masthead {
         text-align: center;
         padding: 70px 0px 30px;
+
         h2 {
             color: #221daf;
             font-family: 'HW Nuckle Trial';
@@ -118,6 +150,7 @@
             font-weight: 800;
             margin-bottom: 4px;
         }
+
         p {
             font-size: 18px;
             color: #000;
@@ -133,7 +166,65 @@
     }
 }
 
+.goal-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    // box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+
+    h2 {
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+
+    button {
+        background-color: #007bff;
+        color: white;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:disabled {
+            background-color: #ccc;
+            cursor: default;
+        }
+    }
+}
+
+.deck-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.deck-goal {
+    background: #f8f9fa;
+    margin-top: 20px;
+    margin: 10px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.goal-header {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
 .create-deck-page {
+
     // background: #221daf;
     .header-card {
         margin-top: 30px;
@@ -144,6 +235,7 @@
         box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
         box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
     }
+
     .page-header {
         h3 {
             font-size: 25px;
@@ -153,22 +245,27 @@
             font-weight: 900;
             margin-bottom: 20px;
         }
+
         p {
             font-size: 16px;
             color: #000;
             margin-bottom: 8px;
         }
+
         .btn {
             display: inline-block;
         }
     }
+
     label {
         color: #fff;
     }
+
     input {
         border-radius: 8px;
         padding: 7px 20px;
     }
+
     textarea {
         min-height: 100px;
         margin-top: 8px;
@@ -180,6 +277,7 @@
     .visibility {
         display: flex;
         align-items: center;
+
         span {
             font-size: 18px;
             margin-top: 5px;
@@ -205,6 +303,7 @@
         font-size: 16px;
         font-weight: 600;
         color: #221daf;
+
         i {
             font-weight: 600;
         }
@@ -220,21 +319,25 @@
         background-color: #fff;
         margin-bottom: 30px;
         box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-        
+
         .header {
             background: #221daf;
             padding: 10px 30px;
             border-radius: 8px 8px 0px 0px;
             border-bottom: 2px solid #dddddd;
-            span, i {
+
+            span,
+            i {
                 font-size: 20px;
                 color: #fff;
                 margin-bottom: 0px;
             }
+
             span {
                 font-weight: 600;
             }
         }
+
         .content {
             padding: 10px 30px;
         }
@@ -243,6 +346,7 @@
             color: #000;
         }
     }
+
     .btn-submit {
         background: #221daf;
         color: #fff;
@@ -254,26 +358,28 @@
     position: relative;
     display: flex;
     align-items: center;
-  }
-  
-  .deck-slider {
+}
+
+.deck-slider {
     display: flex;
     overflow-x: auto;
     scroll-behavior: smooth;
     padding: 10px 0;
     gap: 20px;
-  }
-  
-  .deck-card {
+}
+
+.deck-card {
     min-width: 350px;
     background: #fff;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     flex-shrink: 0;
-  }
-  
-  .arrow {
+}
+
+
+
+.arrow {
     background: none;
     border: none;
     font-size: 24px;
@@ -282,39 +388,42 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 10;
-  }
-  
-  .arrow.left {
-    left: -20px;
-  }
-  
-  .arrow.right {
-    right: -20px;
-  }
+}
 
-  .folder-container {
+.arrow.left {
+    left: -20px;
+}
+
+.arrow.right {
+    right: -20px;
+}
+
+.folder-container {
     background: #fff;
     padding: 30px 30px 20px;
     margin-bottom: 20px;
     border-radius: 8px;
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-    cursor:pointer
-    h5 {
+
+    cursor:pointer h5 {
         margin-bottom: 8px;
         font-weight: 600;
         color: #221daf;
     }
+
     p {
         color: #222;
         font-size: 16px;
         font-weight: 500;
     }
+
     .deck-title-link {
         cursor: pointer;
         color: #221daf;
         font-weight: 500;
+
         &:hover {
-          text-decoration: underline;
+            text-decoration: underline;
         }
     }
     .menu {
@@ -340,6 +449,7 @@
         color: #221daf;
         cursor: pointer;
     }
+
     p:hover {
         text-decoration: underline;
     }
@@ -352,11 +462,60 @@
     border-radius: 8px;
     margin-bottom: 10px;
     width: 100%;
+
     &:hover {
-      background-color: #f0f0f0;
+        background-color: #f0f0f0;
     }
-  }
-  .d-flex.gap-2 {
+}
+
+.d-flex.gap-2 {
     display: flex;
     gap: 10px;
+}
+
+.streak-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.streak-icon {
+    width: auto;
+    height: auto;
+    max-width: 20px;
+    max-height: 20px;
+}
+
+.streak-text {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.progress-container {
+    // display: flex;
+    // align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  progress {
+    width: 100px;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  
+  progress::-webkit-progress-bar {
+    background-color: #e0e0e0;
+    border-radius: 5px;
+  }
+  
+  progress::-webkit-progress-value {
+    background-color: #4caf50;
+    border-radius: 5px;
+  }
+
+  .btn-fail{
+    background: red;
   }

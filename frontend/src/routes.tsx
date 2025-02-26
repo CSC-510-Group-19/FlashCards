@@ -7,6 +7,8 @@ import Explore from 'screens/DashboardScreens/Explore'
 import PracticeDeck from 'screens/DashboardScreens/PracticeDeck'
 import EditDeck from 'screens/DashboardScreens/EditDeck'
 import Home from 'screens/Home'
+import path from 'path'
+import Goals from 'screens/DashboardScreens/Goals'
 
 const homeRoutes = [
   {
@@ -24,6 +26,10 @@ const publicRoutes = [
     exact: true,
     path: '/deck/:id/practice',
     element: <PracticeDeck />,
+  },
+  {
+    path: '/goals',
+    element: <Goals />,
   },
 ]
 
