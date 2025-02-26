@@ -46,6 +46,24 @@ FlashCards is a spaced repetition learning platform to <b>create</b>, <b>memoriz
 ## Watch Flashcards in Action
 [Watch FlashCards Video](./images/FlashCards-2.mp4)
 
+<details>
+
+<summary>Screenshots</summary>
+
+<p style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; ">
+  <img src="./images/dashboard.png" alt="Demo Screens 1" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/deck to folder.png" alt="Demo Screens 2" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/decks in folders.png" alt="Demo Screens 3" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/practice deck.png" alt="Demo Screens 4"width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/quiz.png" alt="Demo Screens 5" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/quiz complete.png" alt="Demo Screens 6" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/leaderboard.png" alt="Demo Screens 7" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/Streaks_SS.png" alt="Demo Screens 8" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/StudyGoals_SS.png" alt="Demo Screens 9" width="444.444px" height="250px style="object-fit: cover;" />
+</p>
+
+</details>
+
 ## Tech Stack
 <a href="https://flask.palletsprojects.com/en/2.2.x/"><img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" /></a>
 <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" /></a>
@@ -59,19 +77,6 @@ FlashCards is a spaced repetition learning platform to <b>create</b>, <b>memoriz
 - Backend [See README.md](https://github.com/Group21-SWE/FlashCards/blob/main/backend/Readme.md)
 - Frontend [See README.md](https://github.com/Group21-SWE/FlashCards/blob/main/frontend/README.md)
 
-## Current Screens
-
-<p style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; ">
-  <img src="./images/dashboard.png" alt="Demo Screens 1" width="444.444px" height="250px style="object-fit: cover;" />
-  <img src="./images/deck to folder.png" alt="Demo Screens 2" width="444.444px" height="250px style="object-fit: cover;" />
-  <img src="./images/decks in folders.png" alt="Demo Screens 3" width="444.444px" height="250px style="object-fit: cover;" />
-  <img src="./images/practice deck.png" alt="Demo Screens 4"width="444.444px" height="250px style="object-fit: cover;" />
-  <img src="./images/quiz.png" alt="Demo Screens 5" width="444.444px" height="250px style="object-fit: cover;" />
-  <img src="./images/quiz complete.png" alt="Demo Screens 6" width="444.444px" height="250px style="object-fit: cover;" />
-  <img src="./images/leaderboard.png" alt="Demo Screens 7" width="444.444px" height="250px style="object-fit: cover;" />
-  <img src="./images/Streaks_SS.png" alt="Demo Screens 8" width="444.444px" height="250px style="object-fit: cover;" />
-  <img src="./images/StudyGoals_SS.png" alt="Demo Screens 9" width="444.444px" height="250px style="object-fit: cover;" />
-</p>
 
 <!-- ## Future Roadmap [See here](https://github.com/users/JohnDamilola/projects/1) -->
 
