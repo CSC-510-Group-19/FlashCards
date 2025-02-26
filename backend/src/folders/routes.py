@@ -137,6 +137,7 @@ def updatefolders():
             obj = folder.val()
             obj['id'] = folder.key()
             obj['decks'] = []
+            print(obj['id'])
             updatefolder_progress(obj['id'])
 
             obj['decks_count'] = len(obj['decks'])
@@ -144,7 +145,7 @@ def updatefolders():
         
         return jsonify(
             folders=folders,
-            message='Fetched folders successfully',
+            message='Updated folders successfully',
             status=200
         ), 200
     except Exception as e:
@@ -187,25 +188,35 @@ def updatefolder_progress(folder_id):
             obj = folders.val()
             obj['id'] = folders.key()  # Optional: if you need the deck ID
             deck_list.append(obj["deckId"])
-        # print("deck_list", deck_list)
+        print("deck_list", deck_list)
+        # print(len(deck_list))
+        deck_list_length = len(deck_list)
         total = 0
         for deck in deck_list:
             deck_obj = db.child("deck").child(deck).get()
             # get_user_score(deckId, userId)
             deck_progress = deck_obj.val()["progress"]
+            print("deck_progress " + str(deck_progress))
             if(deck_progress > 1 or deck_progress < 0):
                 deck_progress = 0
-            total = total + deck_obj.val()["progress"]
+            total = total + deck_progress
+            print("new total: " + str(total))
         
-        folder_progress == 1
-        if(len(deck_list) > 0):
+        print("what happens now")
+        folder_progress = 0
+        print("what of the folder progress")
+        # print("length of deck: " + len(deck_list))
+        if(deck_list_length > 0):
+            print('inside')
             folder_progress = total / len(deck_list)
-        print("folder progress " + str(folder_progress))
+        print("folder name " +  str(folder_id) + " folder progress " + str(folder_progress))
 
         db.child("folder_deck").push({
             "folderId": folder_id,
             "progress": folder_progress
         })
+
+        print("folder progress stored: " + str(db.child("folder_deck").order_by_child("folderId").equal_to(folder_id).get()['progress']))
 
         return jsonify(
             message='Folder Progress updated successfully',

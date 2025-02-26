@@ -27,14 +27,14 @@ interface Deck {
   lastOpened?: string; // Optional for recent decks
   folderId?: string;    // Optional to track folder assignment
   streak?: number;
-  progress: number; 
+  progress?: number; 
 }
 
 interface Folder {
   id: string;
   name: string;
   decks: Deck[];
-  progress: number;
+  progress?: number;
 }
 
 const Dashboard = () => {
@@ -48,6 +48,9 @@ const Dashboard = () => {
   // for streaks
   const [streak, setStreak] = useState(10);
   const isActive = streak > 0; // Streak is active if it's greater than 0
+
+  // for progress tracking
+  const [progress, setProgress] = useState(0);
 
 
   // Refs for sliders
@@ -141,6 +144,8 @@ const Dashboard = () => {
     await http.patch(`/deck/streak/${deckId}`, {})
     fetchDecks(); // Refetch the decks to update both 'decks' and 'recentDecks'
   };
+
+  // const updateDeckProgress = async ()
 
 
 
