@@ -24,6 +24,7 @@ interface Deck {
   cards_count: number;
   lastOpened?: string; // Optional for recent decks
   folderId?: string;    // Optional to track folder assignment
+  progress: number; 
 }
 
 interface Folder {
@@ -103,6 +104,7 @@ const Dashboard = () => {
     try {
       const res = await http.get("/folders/all", { params: { userId: localId } });
       setFolders(res.data?.folders || []);
+      await http.post("/folders/all/update", { userId: localId })
     } catch (err) {
       console.error("Error fetching folders:", err);
     }
@@ -216,7 +218,7 @@ const Dashboard = () => {
                     {
                       folder.decks.length > 0 ?
                       <div className="menu" style={{width: "100px", height: "100px"}}>
-                        <CircularProgressbar className="progress-circle" value={folder.progress} text={`${folder.progress}%`} />
+                        <CircularProgressbar className="progress-circle" value={folder.progress || 0} text={`${folder.progress || 0}%`} />
                       </div>
                       : null
                     }
