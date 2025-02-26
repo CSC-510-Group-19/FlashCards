@@ -69,8 +69,8 @@ FlashCards is a spaced repetition learning platform to <b>create</b>, <b>memoriz
   <img src="./images/quiz.png" alt="Demo Screens 5" width="444.444px" height="250px style="object-fit: cover;" />
   <img src="./images/quiz complete.png" alt="Demo Screens 6" width="444.444px" height="250px style="object-fit: cover;" />
   <img src="./images/leaderboard.png" alt="Demo Screens 7" width="444.444px" height="250px style="object-fit: cover;" />
-  <img src="./images/Streaks_SS.png" alt="Demo Screens 8" width="444.444px" height="250px style="object-fit: cover;"
-  <img src="./images/StudyGoals_SS.png" alt="Demo Screens 9" width="444.444px" height="250px style="object-fit: cover;"
+  <img src="./images/Streaks_SS.png" alt="Demo Screens 8" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/StudyGoals_SS.png" alt="Demo Screens 9" width="444.444px" height="250px style="object-fit: cover;" />
 </p>
 
 <!-- ## Future Roadmap [See here](https://github.com/users/JohnDamilola/projects/1) -->
