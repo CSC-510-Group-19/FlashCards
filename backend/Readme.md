@@ -11,6 +11,7 @@
 ```pip install -r requirements.txt```
 
 ## Setting up Firebase:
+## Do this if you want to set up your own firebase database. The existing database can be used by not changing the existing credentials. The existing database will not give you full security access since it will not be linked to your account, but it should not be a problem for developing on this project.
 
 1. Go to [Firebase](https://firebase.google.com/)
 2. Login/Register your account

@@ -21,3 +21,5 @@
 pip install -r requirements.txt
 python3 test/test.py
 ````````````````````````````````````````````````````````````
+
+PS. The Crypto module might not be found by pyrebase, since pycrypto is deprecated and pycryptodome has a different structure. In such a case, check if the Crypto module is present at site packages and rename if necessary.
