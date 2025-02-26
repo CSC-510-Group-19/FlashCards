@@ -46,6 +46,7 @@ FlashCards is a spaced repetition learning platform to <b>create</b>, <b>memoriz
 
 ## Watch Flashcards in Action
 [Watch FlashCards Video](./images/FlashCards-2.mp4)
+
 [NEW AND IMPROVED](https://youtu.be/VrMM3mXynM0)
 
 <details>
@@ -62,6 +63,8 @@ FlashCards is a spaced repetition learning platform to <b>create</b>, <b>memoriz
   <img src="./images/leaderboard.png" alt="Demo Screens 7" width="444.444px" height="250px style="object-fit: cover;" />
   <img src="./images/Streaks_SS.png" alt="Demo Screens 8" width="444.444px" height="250px style="object-fit: cover;" />
   <img src="./images/StudyGoals_SS.png" alt="Demo Screens 9" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/progress_a.png" alt="Demo Screens 10" width="444.444px" height="250px style="object-fit: cover;" />
+  <img src="./images/progress_b.png" alt="Demo Screens 11" width="444.444px" height="250px style="object-fit: cover;" />
 </p>
 
 </details>
