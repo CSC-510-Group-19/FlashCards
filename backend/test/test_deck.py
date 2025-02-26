@@ -365,6 +365,8 @@ class TestDeck(unittest.TestCase):
         response_data = json.loads(response.data)
         assert response_data['message'] == "Failed to update leaderboard"
         
+    ## Streaks
+        
     @patch('src.deck.routes.db.child')
     def test_get_streak(self, mock_db_child):
         '''Test getting the streak for a deck'''
@@ -374,6 +376,115 @@ class TestDeck(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['streak'], 5) 
         
+    @patch('src.deck.routes.db.child')
+    def test_patch_streak(self, mock_db_child):
+        '''Test updating the streak for a deck'''
+        mock_db_child.return_value.child.return_value.get.return_value.val.return_value = {"streak": 5}
+        mock_db_child.return_value.child.return_value.update.return_value = None
+        
+        response = self.app.patch('/deck/streak/Test', data=json.dumps({"streak": 6}), content_type='application/json')
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['message'], 'Streak updated')
+        
+    @patch("src.deck.routes.db.child")
+    def test_get_streak_invalid_deck(self, mock_db_child):
+        """Test retrieving streak for a non-existent deck."""
+        mock_db_child.return_value.child.return_value.get.return_value.val.return_value = None
+        response = self.app.get("/deck/streak/InvalidDeck")
+        self.assertEqual(response.status_code, 404)
+        
+    
+    @patch('src.deck.routes.db.child')
+    def test_patch_streak_invalid_deck(self, mock_db_child):
+        """Test updating streak for a non-existent deck."""
+        mock_db_child.return_value.child.return_value.get.return_value.val.return_value = None
+        response = self.app.patch("/deck/streak/InvalidDeck", data=json.dumps({"streak": 7}), content_type="application/json")
+        self.assertEqual(response.status_code, 404)
+        
+    @patch("src.deck.routes.db.child")
+    def test_patch_streak_invalid_data(self, mock_db_child):
+        """Test updating the streak with invalid data."""
+        invalid_payloads = [
+            {"goal": "asdfghjkl"},                                              # random
+            {"goal": 12345},                                                    # numbers
+            {},                                                                 # no data
+            {"goal": "Study this deck for 20 minutes", "extra_field": "oops"},  # extra field
+            {"goal": "DROP TABLE users;"}                                       # SQL/code injection
+        ]
+        
+        for payload in invalid_payloads:
+            response = self.app.patch("/deck/streak/Test", data=json.dumps(payload), content_type="application/json")
+            self.assertIn(response.status_code, [400, 422])  # Expecting a bad request or unprocessable entity
+    
+        
+    ## Goals
+        
+    @patch('src.deck.routes.db.child')
+    def test_get_goal(self, mock_db_child):
+        '''Test getting the goal for a deck'''
+        study_goals = [
+            "Study this deck for 20 minutes",
+            "Take a quiz in this deck",
+            "Add 5 new flashcards to this deck"
+        ]
+        mock_db_child.return_value.child.return_value.get.return_value.val.return_value = {
+            "dailyGoal": "Study this deck for 20 minutes",
+            "goalDate": "2024-02-25",
+            "goalCompleted": False
+        }
+        response = self.app.get('/deck/goal/Test')
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(data['goal'], study_goals)
+        self.assertEqual(data['goalCompleted'], False)
+        
+    @patch('src.deck.routes.db.child')
+    def test_patch_goal(self, mock_db_child):
+        '''Test updating the goal for a deck'''
+        mock_db_child.return_value.child.return_value.get.return_value.val.return_value = {
+            "goalProgress": 5,
+        }
+        response = self.app.patch("/deck/goal/Test", data=json.dumps({"goalCompleted": True}), content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+        
+    @patch("src.deck.routes.db.child")
+    def test_get_goal_invalid_deck(self, mock_db_child):
+        """Test retrieving goal for a non-existent deck."""
+        mock_db_child.return_value.child.return_value.get.return_value.val.return_value = None
+        response = self.app.get("/deck/goal/InvalidDeck")
+        self.assertEqual(response.status_code, 404)
+        
+    @patch("src.deck.routes.db.child")
+    def test_patch_goal_invalid_deck(self, mock_db_child):
+        """Test updating goal for a non-existent deck."""
+        mock_db_child.return_value.child.return_value.get.return_value.val.return_value = None
+        response = self.app.patch("/deck/goal/InvalidDeck", data=json.dumps({"goalCompleted": True}), content_type="application/json")
+        self.assertEqual(response.status_code, 404)
+        
+    @patch("src.deck.routes.db.child")
+    def test_patch_goal_invalid_data(self, mock_db_child):
+        """Test updating the goal with invalid data."""
+        invalid_payloads = [
+            {"goal": "asdfghjkl"},                                              # random
+            {"goal": 12345},                                                    # numbers
+            {},                                                                 # no data
+            {"goal": "Study this deck for 20 minutes", "extra_field": "oops"},  # extra field
+            {"goal": "DROP TABLE users;"}                                       # SQL/code injection
+        ]
+        
+        for payload in invalid_payloads:
+            response = self.app.patch("/deck/goal/Test", data=json.dumps(payload), content_type="application/json")
+            self.assertIn(response.status_code, [400, 422])  # Expecting a bad request or unprocessable entity
+    
+        
+    
+        
+
+        
+        
+    
+    
         
 if __name__=="__main__":
     unittest.main()
