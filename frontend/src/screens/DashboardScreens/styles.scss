@@ -77,6 +77,10 @@
                     align-items: center;
                     gap: 7px;
                 }
+                .progress_circle {
+                    width: 100;
+                    height: 100;
+                }
             }
         }
     }
@@ -420,6 +424,21 @@
 
         &:hover {
             text-decoration: underline;
+        }
+    }
+    .menu {
+        padding: 20px 0px 0px;
+        .btn {
+            padding: 0px;
+            font-size: 14px;
+            display: flex;
+            font-weight: 500;
+            align-items: center;
+            gap: 7px;
+        }
+        .progress-circle {
+            width: 100;
+            height: 100;
         }
     }
 }

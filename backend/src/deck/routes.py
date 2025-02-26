@@ -1,6 +1,6 @@
 #MIT License
 #
-#Copyright (c) 2022 John Damilola, Leo Hsiang, Swarangi Gaurkar, Kritika Javali, Aaron Dias Barreto
+#Copyright (c) 2025 Haven Brown, Abhinav Sharma, Trent wiens
 #
 #Permission is hereby granted, free of charge, to any person obtaining a copy
 #of this software and associated documentation files (the "Software"), to deal
@@ -101,7 +101,8 @@ def create():
             "description": description,
             "visibility": visibility,
             "cards_count": 0,
-            "lastOpened": None
+            "lastOpened": None,
+            "progress": 0
         })
 
         return jsonify(message='Create Deck Successful', status=201), 201
@@ -123,7 +124,8 @@ def update(id):
             "userId": localId,
             "title": title,
             "description": description,
-            "visibility": visibility
+            "visibility": visibility,
+            "progress" : 0
         })
 
         return jsonify(message='Update Deck Successful', status=201), 201
@@ -399,6 +401,7 @@ def get_user_score(deckId, userId):
                 "correct": data.get("correct", 0),
                 "incorrect": data.get("incorrect", 0),
             }
+            
             return jsonify({
                 "score": score_data,
                 "message": "User score fetched successfully",
@@ -421,6 +424,30 @@ def get_user_score(deckId, userId):
             "status": 500
         }), 500
 
+@deck_bp.route('/deck/<deckId>/user-score/<userId>', methods=['POST'])
+@cross_origin(supports_credentials=True)
+def update_userscore(deckId):
+    try:
+        print("update userscaore for")
+        data = request.get_json()
+        # Extract values from the request body
+        user_id = data.get("userId")  # Get userId from request body
+        correct = data.get("correct")
+        incorrect = data.get("incorrect")
+
+        if not user_id:
+            return jsonify({"message": "User ID is required"}), 500  # Validate userId presence
+
+        deck_progress = correct / (correct + incorrect)
+        db.child("deck").child(deckId).update({
+            "progress" : deck_progress
+        })
+
+        return jsonify({"message": "Leaderboard updated successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"message": "Failed to update leaderboard", "error": str(e)}), 500
+ 
 # @deck_bp.route('/deck/<id>/last-opened', methods=['PATCH'])
 # @cross_origin(supports_credentials=True)
 # def update_last_opened_deck(id):
