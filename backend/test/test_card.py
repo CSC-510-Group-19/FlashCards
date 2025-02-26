@@ -50,8 +50,8 @@ class CardTestApp(unittest.TestCase):
         )
 
         # Create deck
-        self.client.post(
-            '/deck/create',
+        self.client.get(
+            '/deck/all',
             data=json.dumps({
                 'localId': 'Test',
                 'title': 'TestDeck',
@@ -64,6 +64,22 @@ class CardTestApp(unittest.TestCase):
         # Test get cards
         response = self.client.get('/deck/Test/card/all')
         self.assertEqual(response.status_code, 200)
+
+    @patch('src.deck.routes.db')
+    def test_deck_delete_route(self, mock_cards_db, mock_deck_db, mock_auth):
+        '''Test the deck/delete/<id> route of our app'''
+        responses = []
+        response_1 = self.client.get('/deck/all?localId=Test')
+        test_decks = response_1['decks']
+        for test_deck in test_decks:
+            test_deck_id = test_deck['id']
+            response = self.client.post(
+                '/deck/delete/' + test_deck_id,
+                content_type='application/json'
+            )
+            responses.append(response)
+        assert 500 not in responses
+
 
     @patch('src.auth.routes.auth')
     @patch('src.deck.routes.db')
@@ -148,6 +164,7 @@ class CardTestApp(unittest.TestCase):
         )
         
         self.assertEqual(response.status_code, 201)
+    
 
     @patch('src.auth.routes.auth')
     @patch('src.deck.routes.db')
@@ -257,6 +274,79 @@ class CardTestApp(unittest.TestCase):
         # Test DELETE method on card/create route
         response = self.client.delete('/deck/Test/card/create')
         self.assertEqual(response.status_code, 405)
+
+    @patch('src.deck.routes.db')
+    def test_deck_delete_route(self, mock_cards_db, mock_deck_db, mock_auth):
+        '''Test the deck/delete/<id> route of our app'''
+        responses = []
+        response_1 = self.client.get('/deck/all?localId=Test')
+        test_decks = response_1['decks']
+        for test_deck in test_decks:
+            test_deck_id = test_deck['id']
+            response = self.client.post(
+                '/deck/delete/' + test_deck_id,
+                content_type='application/json'
+            )
+            responses.append(response)
+        assert 500 not in responses
+
+    def test_update_card_invalid_data(self):
+        '''Test updating a card with invalid data'''
+        response = self.client.patch(
+            '/deck/test_deck/update/test_card',
+            data=json.dumps({
+                'word': '',
+                'meaning': 'updated_meaning'
+            }),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'Invalid data provided')
+
+    def test_delete_card_non_existent(self):
+        '''Test deleting a non-existent card'''
+        response = self.client.delete('/deck/test_deck/delete/non_existent_card')
+        self.assertEqual(response.status_code, 404)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'Card not found')
+
+    def test_create_card_missing_fields(self):
+        '''Test creating a card with missing fields'''
+        response = self.client.post(
+            '/deck/Test/card/create',
+            data=json.dumps({
+                'localId': 'Test',
+                'cards': [{'front': '', 'back': 'back'}]
+            }),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'Missing required fields')
+
+    def test_update_card_non_existent_deck(self):
+        '''Test updating a card in a non-existent deck'''
+        response = self.client.patch(
+            '/deck/non_existent_deck/update/test_card',
+            data=json.dumps({
+                'word': 'updated_word',
+                'meaning': 'updated_meaning'
+            }),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 404)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'Deck not found')
+
+    def test_delete_card_database_error(self):
+        '''Test deleting a card with a database error'''
+        with patch('src.cards.routes.db.child') as mock_db:
+            mock_db.return_value.child.return_value.remove.side_effect = Exception("Database error")
+            response = self.client.delete('/deck/test_deck/delete/test_card')
+            self.assertEqual(response.status_code, 500)
+            data = json.loads(response.data)
+            self.assertEqual(data['message'], 'Delete Card Failed')
 
 if __name__ == "__main__":
     unittest.main()
