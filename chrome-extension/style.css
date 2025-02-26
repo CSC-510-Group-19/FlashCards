@@ -12,3 +12,11 @@ h3 {
 input {
     border-radius: 5px;
 }
+
+#submission-message {
+    display: none;
+}
+  
+#submission-message.show {
+    display: block;
+}
