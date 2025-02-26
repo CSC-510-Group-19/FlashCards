@@ -31,7 +31,6 @@ interface Folder {
   name: string;
   decks: Deck[];
   progress: number;
-  missed_questions: Deck;
 }
 
 const Dashboard = () => {
@@ -217,7 +216,6 @@ const Dashboard = () => {
                     {
                       folder.decks.length > 0 ?
                       <div className="menu" style={{width: "100px", height: "100px"}}>
-                        {/* <Link to={`/deck/${folder.missed_questions}/practice`}><button className="btn text-left"><i className="lni lni-book"></i>Practice Missed Questions!</button></Link> */}
                         <CircularProgressbar className="progress-circle" value={folder.progress} text={`${folder.progress}%`} />
                       </div>
                       : null

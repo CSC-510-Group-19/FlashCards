@@ -15,7 +15,6 @@ const Navbar = ({ isDashboard, onFolderCreated }: NavbarProps) => {
   const [newFolderName, setNewFolderName] = useState("");
   const flashCardUser = window.localStorage.getItem("flashCardUser");
   const { localId } = (flashCardUser && JSON.parse(flashCardUser)) || {};
-  const { id } = useParams();
 
   const handleLogout = () => {
     window.localStorage.removeItem("flashCardUser");
@@ -29,20 +28,7 @@ const Navbar = ({ isDashboard, onFolderCreated }: NavbarProps) => {
     }
 
     try {
-      // var deckId = useParams();
-      await http.post("/deck/create", {
-        localId: localId, 
-        title: newFolderName + " Missed Questions", 
-        description: "This deck contains questions you have missed for a quick review!",
-        visibility: 'private'})
-      }
-      catch (err) {
-        Swal.fire("Problem exists in creating empty deck", "", "error");
-      }
-      try {
-      
-      // var deckId = localId;
-      await http.post("/folder/create", { name: newFolderName, userId: localId, deckId: id });
+      await http.post("/folder/create", { name: newFolderName, userId: localId});
       Swal.fire("Folder Created Successfully!", "", "success");
       setIsModalVisible(false);
       setNewFolderName("");
