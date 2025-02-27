@@ -85,7 +85,7 @@ FlashCards is a spaced repetition learning platform to <b>create</b>, <b>memoriz
 
 <!-- ## Future Roadmap [See here](https://github.com/users/JohnDamilola/projects/1) -->
 
-## Suggested Future Features (see [LINK TO POSTER] for more information)
+## Suggested Future Features (see [poster](https://github.com/Group21-SWE/FlashCards/blob/main/images/Poster_Project2.pdf) for more information)
 - [ ] Add a folder deletion function
 - [ ] Improve API Authentication
 - [ ] Improve Sign-up and Log-in Options
