@@ -22,7 +22,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pytest-cov
+        pip install pytest-cov pytest codecov
 
     - name: Run tests
       run: |
