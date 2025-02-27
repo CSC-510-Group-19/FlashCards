@@ -8,6 +8,7 @@ certifi==2022.9.24
 charset-normalizer==2.1.1
 click==8.1.8
 coverage==7.6.12
+codecov
 dominate==2.7.0
 exceptiongroup==1.2.2
 firebase-admin==6.0.0
