@@ -21,13 +21,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest
+        pip install -r requirements.txt
         pip install pytest-cov
-        pip install codecov
 
     - name: Run tests
       run: |
-        pytest --cov-branch --cov-report=xml
+        pytest --cov=src --cov-branch --cov-report=xml backend/test/
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
