@@ -15,7 +15,7 @@
 <a href="https://github.com/WolfByteCollective/FlashCards/actions/workflows/Application.yml" alt="Python application">
 <img src="https://github.com/WolfByteCollective/FlashCards/actions/workflows/Application.yml/badge.svg?style=plastic?branch=main"/> </a>
 
-<a href="https://app.codecov.io/gh/WolfByteCollective/FlashCards" alt="Codecov">
+<a href="https://github.com/Group21-SWE/FlashCards/actions/workflows/codecov.yml" alt="Codecov">
 <img src="https://codecov.io/github/WolfByteCollective/FlashCards/branch/main/graph/badge.svg"/> </a>
 
 <a href="https://doi.org/10.5281/zenodo.14931596" alt="DOI">
