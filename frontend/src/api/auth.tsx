@@ -1,5 +1,6 @@
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { getAuth, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, OAuthProvider } from "firebase/auth";
 import firebase from "firebase/compat";
+import Auth = firebase.auth.Auth;
 
 //In a global declaration file (e.g., globals.d.ts):
 declare global {
@@ -11,28 +12,22 @@ declare global {
 
 const auth = () => {
     const auth = getAuth()
-    const phoneLoginSignUp = (phoneNumber: String) => {
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          'size': 'invisible',
-          'callback': (response: any) => {
-           //onSignInSubmit();
-          },
-          'expired-callback': () => {
-            // Response expired. Ask user to solve reCAPTCHA again.
-            // ...
-          }
-        });
 
+    // method based on documentation example found in https://firebase.google.com/docs/auth/web/apple
+    const oauthSignIn = (provider: OAuthProvider) => {
         // @ts-ignore
-        signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
-            .then((confirmationResult: any) => {
-              // SMS sent. Prompt user to type the code from the message, then sign the
-              // user in with confirmationResult.confirm(code).
-              window.confirmationResult = confirmationResult;
-              // ...
-            }).catch((error) => {
+        signInWithPopup(auth, provider)
+            .then((result) => {
+                const user = result.user
 
-            });
+                const credential = OAuthProvider.credentialFromResult(result)
+                const accessToken = credential?.accessToken
+                const idToken = credential?.idToken
+                window.localStorage.setItem('flashCardUser', JSON.stringify(user));
+            })
+            .catch((error) => {
+                console.log("Error " + error.code + ": " + error.message)
+            })
     }
 }
 
