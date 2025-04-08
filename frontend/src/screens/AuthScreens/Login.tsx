@@ -29,6 +29,7 @@ import Swal from "sweetalert2";
 import { createWatchCompilerHost } from "typescript";
 import http from 'utils/api';
 import "./styles.scss";
+import OAuthOptions from "components/OAuthOptions";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -100,9 +101,11 @@ const Login = () => {
                       required
                     />
                   </div>
-                  <button className="btn btn-main btn-block mb-3" type='submit'>
+                  <button className="btn btn-main btn-block mb-2" type='submit'>
                     {isSubmitting ? 'Logging in...' : 'Login'}
                   </button>
+                  <h3>Or Sign Up</h3>
+                  <OAuthOptions ></OAuthOptions>
                   <p>
                     I don’t have an account?{" "}
                     <Link to="/register">Create account</Link>

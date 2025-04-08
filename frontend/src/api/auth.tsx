@@ -1,5 +1,5 @@
-import { getAuth, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, OAuthProvider } from "firebase/auth";
-import firebase from "firebase/compat";
+import { getAuth, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, OAuthProvider, GoogleAuthProvider, GithubAuthProvider } from "firebase/auth";
+import firebase from 'firebase/compat/app';
 import Auth = firebase.auth.Auth;
 
 //In a global declaration file (e.g., globals.d.ts):
@@ -10,25 +10,31 @@ declare global {
   }
 }
 
-const auth = () => {
-    const auth = getAuth()
+export const signInWithProvider = (providerName: 'google' | 'github' | 'apple') => {
+  const auth = getAuth();
+  let provider;
 
-    // method based on documentation example found in https://firebase.google.com/docs/auth/web/apple
-    const oauthSignIn = (provider: OAuthProvider) => {
-        // @ts-ignore
-        signInWithPopup(auth, provider)
-            .then((result) => {
-                const user = result.user
+  switch (providerName) {
+    case 'google':
+      provider = new GoogleAuthProvider();
+      break;
+    case 'github':
+      provider = new GithubAuthProvider();
+      break;
+    case 'apple':
+      provider = new OAuthProvider('apple.com');
+      break;
+    default:
+      throw new Error("Unsupported provider");
+  }
 
-                const credential = OAuthProvider.credentialFromResult(result)
-                const accessToken = credential?.accessToken
-                const idToken = credential?.idToken
-                window.localStorage.setItem('flashCardUser', JSON.stringify(user));
-            })
-            .catch((error) => {
-                console.log("Error " + error.code + ": " + error.message)
-            })
-    }
-}
-
-export default auth;
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      const user = result.user;
+      window.localStorage.setItem('flashCardUser', JSON.stringify(user));
+      console.log("User signed in:", user);
+    })
+    .catch((error) => {
+      console.error("Auth error:", error.code, error.message);
+    });
+};
