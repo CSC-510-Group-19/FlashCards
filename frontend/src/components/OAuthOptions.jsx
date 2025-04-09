@@ -2,7 +2,7 @@ import { Container, Col, Row } from "react-bootstrap";
 import githubIcon from '../assets/images/sso/github.png';
 import googleIcon from '../assets/images/sso/googleSignIn.png';
 import appleIcon from '../assets/images/sso/applelogin.png';
-import { signInWithProvider } from '../api/auth';
+import { signInWithProvider } from '../api/auth.tsx';
 
 const OAuthOptions = () => {
     
@@ -13,7 +13,7 @@ const OAuthOptions = () => {
       <Row className="alt-login-opt text-center">
       <Col xs="auto">
           <img src={githubIcon} alt="GitHub Login" style={{ height: '100px', width: '100px', cursor: 'pointer',zIndex: 1000,
-    position: 'relative' }}onClick={() => alert("Hello World!")} />
+    position: 'relative' }}onClick={() => {alert("Github clicked");signInWithProvider('github');}} />
         </Col>
         <Col xs="auto">
           <img src={googleIcon} alt="Google Login" style={{ height: '100px', width: '100px', cursor: 'pointer' ,zIndex: 1000,
