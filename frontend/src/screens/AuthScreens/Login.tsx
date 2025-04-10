@@ -101,7 +101,7 @@ const Login = () => {
                       required
                     />
                   </div>
-                  <button className="btn btn-main btn-block mb-2" type='submit'>
+                  <button className="btn btn-main btn-block mb-3" type='submit'>
                     {isSubmitting ? 'Logging in...' : 'Login'}
                   </button>
                   <h3>Or Sign Up</h3>

@@ -7,7 +7,7 @@ import { signInWithProvider } from '../api/auth.tsx';
 const OAuthOptions = () => {
     
   return (
-    <Container className="p-1 m-1">
+    <Container className="p-1 m-2">
       <div
         className="d-flex justify-content-around align-items-center"></div>
       <Row className="alt-login-opt text-center">
