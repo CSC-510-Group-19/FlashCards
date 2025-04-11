@@ -1,5 +1,6 @@
 import { getAuth, signInWithPopup, GithubAuthProvider, OAuthProvider, GoogleAuthProvider } from "firebase/auth";
-import '../initializeFirebase'; 
+import '../initializeFirebase';
+import Swal from "sweetalert2";
 
 export const signInWithProvider = (providerName: 'google' | 'github' | 'apple') => {
   console.log(`Starting authentication with ${providerName}`);
@@ -37,10 +38,24 @@ export const signInWithProvider = (providerName: 'google' | 'github' | 'apple') 
         window.location.reload(); // Optional: refresh page after login
       })
       .catch((error) => {
-        console.error("Auth error code:", error.code);
-        console.error("Auth error message:", error.message);
-        console.error("Full error:", error);
-        alert(`Sign in failed: ${error.message}`);
+        // Handle the account-exists-with-different-credential error
+        if (error.code === 'auth/account-exists-with-different-credential') {
+          const email = error.customData?.email;
+          const credential = GithubAuthProvider.credentialFromError(error);
+          Swal.fire({
+                    icon: 'error',
+                    title: `Email ${email} already exists with a different provider`,
+                    text: 'Try again with that provider.',
+                    confirmButtonColor: '#221daf',
+                  })
+        console.log(`Email ${email} already exists with a different provider`);
+        } else {
+          console.error("Auth error code:", error.code);
+          console.error("Auth error message:", error.message);
+          console.error("Full error:", error);
+          alert(`Sign in failed: ${error.message}`);
+        }
+        
       });
   } catch (error) {
     console.error("Exception in signInWithProvider:", error);

@@ -13,7 +13,7 @@ const OAuthOptions = () => {
       <Row className="alt-login-opt text-center">
       <Col xs="auto">
           <img src={githubIcon} alt="GitHub Login" style={{ height: '100px', width: '100px', cursor: 'pointer',zIndex: 1000,
-    position: 'relative' }}onClick={() => {alert("Github clicked");signInWithProvider('github');}} />
+    position: 'relative' }}onClick={() => {signInWithProvider('github');}} />
         </Col>
         <Col xs="auto">
           <img src={googleIcon} alt="Google Login" style={{ height: '100px', width: '100px', cursor: 'pointer' ,zIndex: 1000,
