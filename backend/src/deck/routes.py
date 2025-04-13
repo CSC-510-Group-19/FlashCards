@@ -27,9 +27,9 @@ from datetime import datetime
 import random
 
 try:
-    from .. import firebase
+    from .. import firebase, token_required, get_user_id_from_request
 except ImportError:
-    from __init__ import firebase
+    from __init__ import firebase, token_required, get_user_id_from_request
 
 
 deck_bp = Blueprint('deck_bp', __name__)
@@ -55,10 +55,11 @@ def getdeck(id):
 
 @deck_bp.route('/deck/all', methods=['GET'])
 @cross_origin(supports_credentials=True)
+@token_required
 def getdecks():
     '''Fetch all decks. Shows private decks for authenticated users and public decks for non-authenticated users.'''
-    args = request.args
-    localId = args.get('localId')
+    localId = get_user_id_from_request()
+    print(localId)
     try:
         decks = []
         # id_list = []

@@ -20,45 +20,59 @@ auth = firebase.auth()
 
 def get_user_id_from_request():
   token = request.headers.get('Authorization')
+  print('get user id token')
+  print(token)
   if not token:
     return jsonify({'message': 'No Authorization Token found'}), 401
 
   # token validator
   try:
-    decoded_token = auth.verify_id_token(token)
-    return jsonify(
-      uid=decoded_token['uid']
-    )
+    user = auth.get_account_info(token)
+    print('valid token2')
+    return user
     # Token is valid
   except auth.InvalidIdTokenError as e:
     # Token is invalid
-    return jsonify({"uid": None, "message": "Invalid token: " + e.message}), 401
+    return jsonify({"uid": None, "message": "Invalid token"}), 401
   except auth.UserDisabledError as e:
     # Token belongs to a disabled user record
-    return jsonify({"uid": None, "Message": "User disabled: " + e.message}), 401
+    return jsonify({"uid": None, "Message": "User disabled"}), 401
+
 
 def token_required(f):
   @wraps(f)
   def decorated(*args, **kwargs):
-    uid_json = get_user_id_from_request(request)
-    if uid_json.get('uid') is None:
-      return uid_json
+    # try:
+    #     uid = get_user_id_from_request(request)
+    #     return uid_json.get('uid')
+    # except BadRequest:
+    #     return jsonify({'error': 'Invalid JSON'}), 400
+    #
+    # if uid_json['uid'] is None:
+    #     return uid_json
+    uid = get_user_id_from_request()
+    print("token required uid ")
+    print(uid)
+
+    if type(uid) is not str:
+      return uid
+
     return f(*args, **kwargs)
 
   return decorated
 
 
 def has_folder_rights(f):
-  '''this function is a decorator that checks if the authorization token in the header
+  """this function is a decorator that checks if the authorization token in the header
   corresponds to the user id in the decorated function parameters. For this to work as intended
-  the decorated function must have the user id must have the rights to modify the folder corresponding to folder id in a parameter folder_Id.'''
+  the decorated function must have the user id must have the rights to modify the folder corresponding
+  to folder id in a parameter folder_Id."""
 
   @wraps(f)
   def decorated(*args, **kwargs):
-    uid_json = get_user_id_from_request(request)
-    if uid_json.get('uid') is None:
-      return uid_json
-    uid = uid_json.get('uid')
+    uid = get_user_id_from_request()
+    if type(uid) is not str:
+      return uid
 
     folder_snapshot = db.child("folder").child(kwargs.get('folder_id', None)).get()
     if not folder_snapshot.exists:

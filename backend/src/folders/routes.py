@@ -26,9 +26,9 @@ from flask_cors import cross_origin # type: ignore
 # from __init__ import firebase
 
 try:
-    from .. import firebase
+    from .. import db, firebase, token_required, get_user_id_from_request
 except ImportError:
-    from __init__ import firebase
+    from __init__ import db, firebase, token_required, get_user_id_from_request
     
 folder_bp = Blueprint(
     'folder_bp', __name__
@@ -57,6 +57,7 @@ def getfolder(id):
 
 @folder_bp.route('/folders/all', methods=['GET'])
 @cross_origin(supports_credentials=True)
+@token_required
 def getfolders():
     '''This method is called when we want to fetch all folders for a specific user'''
     args = request.args

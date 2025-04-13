@@ -91,7 +91,7 @@ const Dashboard = () => {
   const fetchDecks = async () => {
     setFetchingDecks(true);
     try {
-      const res = await http.get("/deck/all", { params: { localId } });
+      const res = await http.get("/deck/all", );
       let _decks = res.data?.decks || [];
 
       // Fetch streaks for all decks
