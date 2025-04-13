@@ -130,7 +130,7 @@ const Dashboard = () => {
 
   const fetchFolders = async () => {
     try {
-      const res = await http.get("/folders/all", { params: { userId: localId } });
+      const res = await http.get("/folders/all");
       console.log(res)
       setFolders(res.data?.folders || []);
       await http.post("/folders/all/update", { userId: localId })

@@ -6,6 +6,7 @@ import { Route, Routes, useLocation } from 'react-router'
 import { authRoutes, dashboardRoutes, homeRoutes, publicRoutes } from './routes'
 import "swiper/css/bundle";
 import 'bootstrap/dist/css/bootstrap.css';
+import './initializeFirebase'
 
 const App = () => {
   const location = useLocation()
