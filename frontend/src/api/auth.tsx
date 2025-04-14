@@ -2,7 +2,7 @@ import { getAuth, signInWithPopup, GithubAuthProvider, OAuthProvider, GoogleAuth
 import '../initializeFirebase';
 import Swal from "sweetalert2";
 
-export const signInWithProvider = (providerName: 'google' | 'github' | 'facebook') => {
+export const signInWithProvider = (providerName: string) => {
   console.log(`Starting authentication with ${providerName}`);
   
   try {

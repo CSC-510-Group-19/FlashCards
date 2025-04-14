@@ -163,7 +163,7 @@ describe("Login Component", () => {
 
     expect(screen.getByAltText("GitHub Login")).toBeInTheDocument();
     expect(screen.getByAltText("Google Login")).toBeInTheDocument();
-    expect(screen.getByAltText("Apple Login")).toBeInTheDocument();
+    expect(screen.getByAltText("Facebook Login")).toBeInTheDocument();
   });
 
   test("renders oauth options in register", () => {
@@ -178,7 +178,7 @@ describe("Login Component", () => {
 
     expect(screen.getByAltText("GitHub Login")).toBeInTheDocument();
     expect(screen.getByAltText("Google Login")).toBeInTheDocument();
-    expect(screen.getByAltText("Apple Login")).toBeInTheDocument();
+    expect(screen.getByAltText("Facebook Login")).toBeInTheDocument();
   });
 
   test('calls signInWithProvider with "github" when GitHub image is clicked', () => {
@@ -197,10 +197,10 @@ describe("Login Component", () => {
     spy.mockRestore();
   });
 
-  test('calls signInWithProvider with "facebook" when Apple image is clicked', () => {
+  test('calls signInWithProvider with "facebook" when Facebook image is clicked', () => {
     const spy = jest.spyOn(AuthApi, "signInWithProvider").mockImplementation(jest.fn());
     render(<OAuthOptions />);
-    fireEvent.click(screen.getByAltText("Apple Login"));
+    fireEvent.click(screen.getByAltText("Facebook Login"));
     expect(AuthApi.signInWithProvider).toHaveBeenCalledWith("facebook");
     spy.mockRestore();
   });
