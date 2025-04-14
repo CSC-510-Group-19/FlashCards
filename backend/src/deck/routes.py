@@ -27,20 +27,21 @@ from datetime import datetime
 import random
 
 try:
-    from .. import firebase, token_required, get_user_id_from_request
+    from .. import firebase, token_required, get_user_id_from_request, deck_is_visible, has_deck_rights
 except ImportError:
-    from __init__ import firebase, token_required, get_user_id_from_request
+    from __init__ import firebase, token_required, get_user_id_from_request, deck_is_visible, has_deck_rights
 
 
 deck_bp = Blueprint('deck_bp', __name__)
 db = firebase.database()
 
-@deck_bp.route('/deck/<id>', methods=['GET'])
+@deck_bp.route('/deck/<deck_id>', methods=['GET'])
 @cross_origin(supports_credentials=True)
-def getdeck(id):
+@deck_is_visible
+def getdeck(deck_id):
     '''This method fetches a specific deck by its ID.'''
     try:
-        deck = db.child("deck").child(id).get()
+        deck = db.child("deck").child(deck_id).get()
         return jsonify(
             deck=deck.val(),
             message='Fetched deck successfully',
@@ -59,7 +60,6 @@ def getdeck(id):
 def getdecks():
     '''Fetch all decks. Shows private decks for authenticated users and public decks for non-authenticated users.'''
     localId = get_user_id_from_request()
-    print(localId)
     try:
         decks = []
         # id_list = []
@@ -87,11 +87,12 @@ def getdecks():
 
 @deck_bp.route('/deck/create', methods=['POST'])
 @cross_origin(supports_credentials=True)
+@token_required
 def create():
     '''Create a new deck.'''
     try:
         data = request.get_json()
-        localId = data['localId']
+        localId = get_user_id_from_request()
         title = data['title']
         description = data['description']
         visibility = data['visibility']
@@ -110,18 +111,19 @@ def create():
     except Exception as e:
         return jsonify(message=f'Create Deck Failed {e}', status=500), 500
 
-@deck_bp.route('/deck/update/<id>', methods=['PATCH'])
+@deck_bp.route('/deck/update/<deck_id>', methods=['PATCH'])
 @cross_origin(supports_credentials=True)
-def update(id):
+@has_deck_rights
+def update(deck_id):
     '''Update an existing deck.'''
     try:
         data = request.get_json()
-        localId = data['localId']
+        localId = get_user_id_from_request()
         title = data['title']
         description = data['description']
         visibility = data['visibility']
 
-        db.child("deck").child(id).update({
+        db.child("deck").child(deck_id).update({
             "userId": localId,
             "title": title,
             "description": description,
@@ -133,33 +135,36 @@ def update(id):
     except Exception as e:
         return jsonify(message=f'Update Deck Failed {e}', status=500), 500
 
-@deck_bp.route('/deck/delete/<id>', methods=['DELETE'])
+@deck_bp.route('/deck/delete/<deck_id>', methods=['DELETE'])
 @cross_origin(supports_credentials=True)
-def delete(id):
+@has_deck_rights
+def delete(deck_id):
     '''Delete a deck.'''
     try:
-        db.child("deck").child(id).remove()
+        db.child("deck").child(deck_id).remove()
         return jsonify(message='Delete Deck Successful', status=200), 200
     except Exception as e:
         return jsonify(message=f'Delete Deck Failed {e}', status=500), 500
 
-@deck_bp.route('/deck/updateLastOpened/<id>', methods=['PATCH'])
+@deck_bp.route('/deck/updateLastOpened/<deck_id>', methods=['PATCH'])
 @cross_origin(supports_credentials=True)
-def update_last_opened(id):
+@deck_is_visible
+def update_last_opened(deck_id):
     '''Update the lastOpened timestamp when a deck is opened.'''
     try:
         current_time = datetime.utcnow().isoformat()
-        db.child("deck").child(id).update({"lastOpened": current_time})
+        db.child("deck").child(deck_id).update({"lastOpened": current_time})
         return jsonify(message='Deck lastOpened updated successfully', status=200), 200
     except Exception as e:
         return jsonify(message=f'Failed to update lastOpened: {e}', status=500), 500
 
-@deck_bp.route('/deck/streak/<id>', methods=['GET', 'PATCH'])
+@deck_bp.route('/deck/streak/<deck_id>', methods=['GET', 'PATCH'])
 @cross_origin(supports_credentials=True)
-def handle_streak(id):
+@has_deck_rights
+def handle_streak(deck_id):
     if request.method == 'GET':
         try:
-            deck_data = db.child("deck").child(id).get()
+            deck_data = db.child("deck").child(deck_id).get()
             if not deck_data.val():
                 return jsonify(message="Deck not found", status=404), 404
 
@@ -173,7 +178,7 @@ def handle_streak(id):
             data = request.get_json()  
             # print(f"Received request to update streak for deck {id} with data: {data}")
 
-            deck_data = db.child("deck").child(id).get()
+            deck_data = db.child("deck").child(deck_id).get()
             if not deck_data.val():
                 return jsonify(message="Deck not found", status=404), 404
 
@@ -199,7 +204,7 @@ def handle_streak(id):
             else:
                 current_streak = 1
 
-            db.child("deck").child(id).update({
+            db.child("deck").child(deck_id).update({
                 "streak": current_streak,
                 "lastOpened": today
             })
@@ -209,12 +214,13 @@ def handle_streak(id):
             return jsonify(message="Streak updated", streak=current_streak, status=200), 200
 
         except Exception as e:
-            print(f"Error updating streak for deck {id}: {e}")  
+            print(f"Error updating streak for deck {deck_id}: {e}")
             return jsonify(message=f"Failed to update streak: {e}", status=400), 400
         
-@deck_bp.route('/deck/goal/<id>', methods=['GET', 'PATCH'])
+@deck_bp.route('/deck/goal/<deck_id>', methods=['GET', 'PATCH'])
 @cross_origin(supports_credentials=True)
-def handle_goal(id):
+@has_deck_rights
+def handle_goal(deck_id):
     studyGoals = [
         "Study this deck for 20 minutes",
         "Add 5 new flashcards to this deck",
@@ -222,7 +228,7 @@ def handle_goal(id):
     ]  
     if (request.method == 'GET'):
         try:
-            deck_data = db.child("deck").child(id).get()
+            deck_data = db.child("deck").child(deck_id).get()
             if not deck_data.val():
                 return jsonify(message="Deck not found", status=404), 404
 
@@ -242,14 +248,14 @@ def handle_goal(id):
                 if "Study this deck for 20 minutes" in new_goal:
                     target = 150  # 20 minutes (1200 seconds)
                 elif "Add 5 new flashcards" in new_goal:
-                    current_card_count = db.child("card").order_by_child("deckId").equal_to(id).get().val()
+                    current_card_count = db.child("card").order_by_child("deckId").equal_to(deck_id).get().val()
                     current_card_count = len(current_card_count) if current_card_count else 0
 
                     target = current_card_count + 5  # 5 flashcards
                 elif "Take a quiz in this deck" in new_goal:
                     target = 1 # 1 quiz
                 
-                db.child("deck").child(id).update({
+                db.child("deck").child(deck_id).update({
                     "dailyGoal": new_goal,
                     "goalDate": today,
                     "goalCompleted": False,
@@ -270,7 +276,7 @@ def handle_goal(id):
             
             print("recived patch with ", progress)
 
-            deck_data = db.child("deck").child(id).get()
+            deck_data = db.child("deck").child(deck_id).get()
             if not deck_data.val():
                 return jsonify(message="Deck not found", status=404), 404
             
@@ -289,7 +295,7 @@ def handle_goal(id):
             print("goal target: ", goal_target)
             print(goal_completed)
 
-            db.child("deck").child(id).update({
+            db.child("deck").child(deck_id).update({
                 "goalProgress": goal_progress,
                 "goalCompleted": goal_completed
             })
@@ -298,12 +304,13 @@ def handle_goal(id):
         except Exception as e:
             return jsonify(message=f"Error updating goal: {e}", status=400), 400
         
-@deck_bp.route('/deck/quizCompleted/<id>', methods=['PATCH'])
+@deck_bp.route('/deck/quizCompleted/<deck_id>', methods=['PATCH'])
 @cross_origin(supports_credentials=True)
-def update_quiz_progress(id):
+@has_deck_rights
+def update_quiz_progress(deck_id):
     '''Automatically update progress when a quiz is completed.'''
     try:
-        deck_data = db.child("deck").child(id).get()
+        deck_data = db.child("deck").child(deck_id).get()
         if not deck_data.val():
             return jsonify(message="Deck not found", status=404), 404
 
@@ -317,7 +324,7 @@ def update_quiz_progress(id):
             goal_progress += 1
             goal_completed = goal_progress >= goal_target
 
-        db.child("deck").child(id).update({
+        db.child("deck").child(deck_id).update({
             "goalProgress": goal_progress,
             "goalCompleted": goal_completed
         })
@@ -328,13 +335,14 @@ def update_quiz_progress(id):
     
 
 
-@deck_bp.route('/deck/<deckId>/leaderboard', methods=['GET'])
+@deck_bp.route('/deck/<deck_id>/leaderboard', methods=['GET'])
 @cross_origin(supports_credentials=True)
-def get_leaderboard(deckId):
+@deck_is_visible
+def get_leaderboard(deck_id):
     '''This endpoint fetches the leaderboard data for a specific deck.'''
     try:
         # Fetch leaderboard data for the given deck
-        leaderboard_entries = db.child("leaderboard").child(deckId).get()
+        leaderboard_entries = db.child("leaderboard").child(deck_id).get()
         leaderboard = []
         for entry in leaderboard_entries.each():
             data = entry.val()
@@ -362,6 +370,7 @@ def get_leaderboard(deckId):
     
 @deck_bp.route('/deck/<deck_id>/update-leaderboard', methods=['POST'])
 @cross_origin(supports_credentials=True)
+@deck_is_visible
 def update_leaderboard(deck_id):
     try:
         data = request.get_json()
@@ -388,13 +397,14 @@ def update_leaderboard(deck_id):
     except Exception as e:
         return jsonify({"message": "Failed to update leaderboard", "error": str(e)}), 500
     
-@deck_bp.route('/deck/<deckId>/user-score/<userId>', methods=['GET'])
+@deck_bp.route('/deck/<deck_id>/user-score/<userId>', methods=['GET'])
 @cross_origin(supports_credentials=True)
-def get_user_score(deckId, userId):
+@has_deck_rights
+def get_user_score(deck_id, userId):
     '''This endpoint fetches the user's score for a specific deck. If the user doesn't exist, return zero for all score values.'''
     try:
         # Fetch the user's leaderboard entry for the specified deck
-        leaderboard_entry = db.child("leaderboard").child(deckId).child(userId).get()
+        leaderboard_entry = db.child("leaderboard").child(deck_id).child(userId).get()
 
         if leaderboard_entry.val() is not None:  # Check if the entry has data
             data = leaderboard_entry.val()  # Get the value of the entry
@@ -425,9 +435,10 @@ def get_user_score(deckId, userId):
             "status": 500
         }), 500
 
-@deck_bp.route('/deck/<deckId>/user-score/<userId>', methods=['POST'])
+@deck_bp.route('/deck/<deck_id>/user-score/<userId>', methods=['POST'])
 @cross_origin(supports_credentials=True)
-def update_userscore(deckId):
+@has_deck_rights
+def update_userscore(deck_id):
     try:
         print("update userscaore for")
         data = request.get_json()
@@ -440,7 +451,7 @@ def update_userscore(deckId):
             return jsonify({"message": "User ID is required"}), 500  # Validate userId presence
 
         deck_progress = correct / (correct + incorrect)
-        db.child("deck").child(deckId).update({
+        db.child("deck").child(deck_id).update({
             "progress" : deck_progress
         })
 

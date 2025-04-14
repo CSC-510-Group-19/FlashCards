@@ -27,14 +27,7 @@ const App = () => {
       user.getIdToken().then((idToken) => {
         // Send the ID token to your backend or use it for other purposes
         console.log(idToken);
-        http.interceptors.request.use(
-            async(config) => {
-              config.headers.Authorization = `${idToken}`
-              return config
-            }, (error) => {
-              return Promise.reject(error)
-            }
-        )
+        window.localStorage.setItem('idToken', idToken);
       }).catch((error) => {
         // Handle error
         console.error(error);

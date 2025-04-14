@@ -35,6 +35,7 @@ const EditDeck = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const flashCardUser = window.localStorage.getItem('flashCardUser');
+  const idToken = window.localStorage.getItem('idToken');
   const { localId } = flashCardUser && JSON.parse(flashCardUser) || {};
   const { id } = useParams();
 
@@ -49,7 +50,11 @@ const EditDeck = () => {
     setIsSubmitting(true);
 
     await http
-      .patch(`/deck/update/${id}`, payload)
+      .patch(`/deck/update/${id}`, payload, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      })
       .then((res) => {
         const { id } = res.data;
         Swal.fire({

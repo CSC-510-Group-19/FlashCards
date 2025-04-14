@@ -45,6 +45,8 @@ const Dashboard = () => {
   const [isFolderPopupVisible, setIsFolderPopupVisible] = useState(false);
   const [selectedFolderDecks, setSelectedFolderDecks] = useState<Deck[]>([]);
 
+  const idToken = window.localStorage.getItem('idToken');
+
   // for streaks
   const [streak, setStreak] = useState(10);
   const isActive = streak > 0; // Streak is active if it's greater than 0
@@ -91,7 +93,11 @@ const Dashboard = () => {
   const fetchDecks = async () => {
     setFetchingDecks(true);
     try {
-      const res = await http.get("/deck/all", );
+      const res = await http.get("/deck/all", {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      });
       let _decks = res.data?.decks || [];
 
       // Fetch streaks for all decks
@@ -130,10 +136,18 @@ const Dashboard = () => {
 
   const fetchFolders = async () => {
     try {
-      const res = await http.get("/folders/all");
+      const res = await http.get("/folders/all",{
+        headers: {
+          'Authorization': `${idToken}`
+        }
+    });
       console.log(res)
       setFolders(res.data?.folders || []);
-      await http.post("/folders/all/update", { userId: localId })
+      await http.post("/folders/all/update", { userId: localId }, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      })
     } catch (err) {
       console.error("Error fetching folders:", err);
     }
@@ -141,8 +155,16 @@ const Dashboard = () => {
 
   const updateLastOpened = async (deckId: string) => {
     const timestamp = new Date().toISOString(); // Get the current timestamp
-    await http.patch(`/deck/updateLastOpened/${deckId}`, { lastOpened: timestamp });
-    await http.patch(`/deck/streak/${deckId}`, {})
+    await http.patch(`/deck/updateLastOpened/${deckId}`, { lastOpened: timestamp }, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      });
+    await http.patch(`/deck/streak/${deckId}`, {}, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      })
     fetchDecks(); // Refetch the decks to update both 'decks' and 'recentDecks'
   };
 
@@ -152,7 +174,11 @@ const Dashboard = () => {
 
   const handleFolderClick = async (folder: Folder) => {
     try {
-      const res = await http.get(`/deck/get-deck/${folder.id}`);
+      const res = await http.get(`/deck/get-deck/${folder.id}`, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+    });
       console.log(res)
       setSelectedFolderDecks(res.data?.decks || []);
       setIsFolderPopupVisible(true);
@@ -168,7 +194,11 @@ const Dashboard = () => {
 
   const handleDeleteDeck = async (id: string) => {
     try {
-      await http.delete(`/deck/delete/${id}`);
+      await http.delete(`/deck/delete/${id}`, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+    });
       Swal.fire("Deck Deleted Successfully!", "", "success").then(() => fetchDecks());
     } catch (err) {
       Swal.fire("Deck Deletion Failed!", "", "error");
@@ -177,7 +207,11 @@ const Dashboard = () => {
 
   const handleAddDeckToFolder = async (deckId: string, folderId: string) => {
     try {
-      await http.post("/deck/add-deck", { deckId, folderId });
+      await http.post("/deck/add-deck", { deckId, folderId }, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      });
       fetchDecks();
       fetchFolders();
       Swal.fire("Deck added to folder!", "", "success");
