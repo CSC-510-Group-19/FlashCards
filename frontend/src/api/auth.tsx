@@ -1,8 +1,8 @@
-import { getAuth, signInWithPopup, GithubAuthProvider, OAuthProvider, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, signInWithPopup, GithubAuthProvider, OAuthProvider, GoogleAuthProvider, FacebookAuthProvider } from "firebase/auth";
 import '../initializeFirebase';
 import Swal from "sweetalert2";
 
-export const signInWithProvider = (providerName: 'google' | 'github' | 'apple') => {
+export const signInWithProvider = (providerName: 'google' | 'github' | 'facebook') => {
   console.log(`Starting authentication with ${providerName}`);
   
   try {
@@ -20,8 +20,8 @@ export const signInWithProvider = (providerName: 'google' | 'github' | 'apple') 
         console.log("Creating GitHub provider");
         provider = new GithubAuthProvider();
         break;
-      case 'apple':
-        provider = new OAuthProvider('apple.com');
+      case 'facebook':
+        provider = new FacebookAuthProvider();
         break;
       default:
         throw new Error("Unsupported provider");
@@ -32,7 +32,23 @@ export const signInWithProvider = (providerName: 'google' | 'github' | 'apple') 
     signInWithPopup(auth, provider)
       .then((result) => {
         console.log("Sign in successful");
-        const user = result.user;
+        const firebaseUser = result.user;
+
+         // Extract relevant user data in the same format as your backend returns
+         const user = {
+          localId: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+          photoURL: firebaseUser.photoURL,
+          // Add any other fields your backend provides
+          providerId: providerName,
+          // If your backend user object needs these:
+          emailVerified: firebaseUser.emailVerified,
+          // Add a token if your backend expects it for verification
+          idToken: firebaseUser.getIdToken ? firebaseUser.getIdToken() : null
+        };
+        
+
         window.localStorage.setItem('flashCardUser', JSON.stringify(user));
         console.log("User signed in:", user);
         window.location.reload(); // Optional: refresh page after login
@@ -41,7 +57,6 @@ export const signInWithProvider = (providerName: 'google' | 'github' | 'apple') 
         // Handle the account-exists-with-different-credential error
         if (error.code === 'auth/account-exists-with-different-credential') {
           const email = error.customData?.email;
-          const credential = GithubAuthProvider.credentialFromError(error);
           Swal.fire({
                     icon: 'error',
                     title: `Email ${email} already exists with a different provider`,
