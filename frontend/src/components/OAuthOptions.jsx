@@ -21,7 +21,7 @@ const OAuthOptions = () => {
         </Col>
         <Col xs="auto">
           <img src={appleIcon} alt="Apple Login" style={{ height: '100px', width: '100px', cursor: 'pointer', zIndex: 1000,
-    position: 'relative'}} onClick={() => signInWithProvider('apple')} />
+    position: 'relative'}} onClick={() => signInWithProvider('facebook')} />
         </Col>
       </Row>
     </Container>
