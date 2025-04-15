@@ -27,6 +27,8 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import http from "utils/api";
 import "./styles.scss";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import OAuthOptions from "components/OAuthOptions";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -36,35 +38,27 @@ const Register = () => {
 
   const handleRegister = async (e: any) => {
     e.preventDefault();
-    const payload = {
-      email,
-      password,
-    };
     setIsSubmitting(true);
 
-    await http
-      .post("/signup", payload)
-      .then((res) => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Registration Successful!',
-          text: 'You have successfully created an account',
-          confirmButtonColor: '#221daf',
-        }).then(() => {
-          window.location.replace("/login");
+    const auth = getAuth()
+    createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          window.localStorage.setItem('flashCardUser', JSON.stringify(user))
+          Swal.fire({
+            icon: 'success',
+            title: 'Registration Successful!',
+            text: 'You have successfully created an account',
+            confirmButtonColor: '#221daf',
+          }).then(() => {
+            window.location.replace("/dashboard");
+          })
+          setIsSubmitting(false);
         })
-        setIsSubmitting(false);
-      })
-      .catch((err) => {
-        console.log(err)
-        Swal.fire({
-          icon: 'error',
-          title: 'Registration Failed!',
-          text: 'An error occurred, please try again',
-          confirmButtonColor: '#221daf',
+        .catch((error) => {
+            console.log("Error " + error.code + ": " + error.message);
+            setIsSubmitting(false);
         })
-        setIsSubmitting(false);
-      });
   };
 
   return (
@@ -109,6 +103,8 @@ const Register = () => {
                   <button className="btn btn-main btn-block mb-3" type="submit">
                     {isSubmitting ? 'Creating Account...' : 'Create Account'}
                   </button>
+                  <h3>Or Sign Up</h3>
+                  <OAuthOptions ></OAuthOptions>
                   <p>
                     Already have an account? <Link to="/login">Login</Link>
                   </p>

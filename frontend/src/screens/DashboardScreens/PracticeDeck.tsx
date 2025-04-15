@@ -65,6 +65,7 @@ const PracticeDeck = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
 
   const flashCardUser = window.localStorage.getItem("flashCardUser");
+  const idToken = window.localStorage.getItem('idToken');
   const { localId } = (flashCardUser && JSON.parse(flashCardUser)) || {};
   const { id } = useParams();
 
@@ -76,7 +77,11 @@ const PracticeDeck = () => {
   const fetchDeck = async () => {
     setFetchingDeck(true);
     try {
-      const res = await http.get(`/deck/${id}`);
+      const res = await http.get(`/deck/${id}`, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      });
       setDeck(res.data?.deck);
     } finally {
       setFetchingDeck(false);
@@ -86,7 +91,11 @@ const PracticeDeck = () => {
   const fetchCards = async () => {
     setFetchingCards(true);
     try {
-      const res = await http.get(`/deck/${id}/card/all`);
+      const res = await http.get(`/deck/${id}/card/all`, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      });
       setCards(res.data?.cards || []);
     } finally {
       setFetchingCards(false);
@@ -95,7 +104,11 @@ const PracticeDeck = () => {
 
   const fetchLeaderboard = async () => {
     try {
-      const res = await http.get(`/deck/${id}/leaderboard`);
+      const res = await http.get(`/deck/${id}/leaderboard`, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      });
       // Format lastAttempt before setting leaderboard data
       const formattedLeaderboard = (res.data?.leaderboard || []).map((entry: { lastAttempt: string | number | Date; }) => ({
         ...entry,

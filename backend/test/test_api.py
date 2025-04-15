@@ -3,6 +3,9 @@ from flask import Flask
 from unittest.mock import patch
 from src.api import create_app  # Import the create_app function from your main module
 
+from backend.src import get_user_id_from_request
+
+
 class TestCreateApp(unittest.TestCase):
     
     def setUp(self):

@@ -21,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { isLabelWithInternallyDisabledControl } from "@testing-library/user-event/dist/utils";
 import { message } from "antd";
 import { useState } from "react";
@@ -29,13 +31,14 @@ import Swal from "sweetalert2";
 import { createWatchCompilerHost } from "typescript";
 import http from 'utils/api';
 import "./styles.scss";
+import OAuthOptions from "components/OAuthOptions";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = async(e: any) => {
+  const handleEmailLogin = async(e: any) => {
     e.preventDefault();
     const payload = {
       email,
@@ -43,30 +46,25 @@ const Login = () => {
     };
     setIsSubmitting(true);
 
-    await http
-      .post("/login", payload)
-      .then((res) => {
-        const { user } = res.data || {};
-        window.localStorage.setItem('flashCardUser', JSON.stringify(user));
-        Swal.fire({
-          icon: 'success',
-          title: 'Login Successful!',
-          text: 'You have successfully logged in',
-          confirmButtonColor: '#221daf',
-        }).then(() => {
-          setIsSubmitting(false);
-          window.location.replace("/dashboard"); 
-        });
-      })
-      .catch((err) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Login Failed!',
-          text: 'An error occurred, please try again',
-          confirmButtonColor: '#221daf',
-        });
-        setIsSubmitting(false);
-      });
+    const auth = getAuth()
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          window.localStorage.setItem('flashCardUser', JSON.stringify(user))
+          Swal.fire({
+            icon: 'success',
+            title: 'Login Successful!',
+            text: 'You have successfully logged in',
+            confirmButtonColor: '#221daf',
+          }).then(() => {
+            setIsSubmitting(false);
+            window.location.replace("/dashboard");
+          });
+        })
+        .catch((error) => {
+            console.log("Error " + error.code + ": " + error.message);
+            setIsSubmitting(false);
+        })
   };
 
   return (
@@ -77,7 +75,7 @@ const Login = () => {
             <div className="col-md-5">
               <div className="login-card">
                 <h3>Welcome back! 👋🏼</h3>
-                <form onSubmit={handleLogin}>
+                <form onSubmit={handleEmailLogin}>
                   <div className="form-group">
                     <label htmlFor="email">Email address</label>
                     <input
@@ -103,6 +101,8 @@ const Login = () => {
                   <button className="btn btn-main btn-block mb-3" type='submit'>
                     {isSubmitting ? 'Logging in...' : 'Login'}
                   </button>
+                  <h3>Or Sign Up</h3>
+                  <OAuthOptions ></OAuthOptions>
                   <p>
                     I don’t have an account?{" "}
                     <Link to="/register">Create account</Link>

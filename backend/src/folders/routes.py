@@ -26,9 +26,9 @@ from flask_cors import cross_origin # type: ignore
 # from __init__ import firebase
 
 try:
-    from .. import firebase
+    from .. import db, firebase, token_required, get_user_id_from_request, has_folder_rights, has_folder_and_deck_rights
 except ImportError:
-    from __init__ import firebase
+    from __init__ import db, firebase, token_required, get_user_id_from_request, has_folder_rights, has_folder_and_deck_rights
     
 folder_bp = Blueprint(
     'folder_bp', __name__
@@ -36,12 +36,13 @@ folder_bp = Blueprint(
 
 db = firebase.database()
 
-@folder_bp.route('/folder/<id>', methods=['GET'])
+@folder_bp.route('/folder/<folder_id>', methods=['GET'])
 @cross_origin(supports_credentials=True)
-def getfolder(id):
+@has_folder_rights
+def getfolder(folder_id):
     '''This method is called when we want to fetch one of the folders by folder ID'''
     try:
-        folder = db.child("folder").child(id).get()
+        folder = db.child("folder").child(folder_id).get()
         return jsonify(
             folder=folder.val(),
             message='Fetched folder successfully',
@@ -57,10 +58,10 @@ def getfolder(id):
 
 @folder_bp.route('/folders/all', methods=['GET'])
 @cross_origin(supports_credentials=True)
+@token_required
 def getfolders():
     '''This method is called when we want to fetch all folders for a specific user'''
-    args = request.args
-    userId = args and args['userId']
+    userId = get_user_id_from_request()
     try:
         #db.child("folder_deck").order_by_child("folderId").equal_to(folder_id).get()['progress']
         user_folders = db.child("folder").order_by_child("userId").equal_to(userId).get()
@@ -94,6 +95,7 @@ def getfolders():
 
 @folder_bp.route('/folder/create', methods=['POST'])
 @cross_origin(supports_credentials=True)
+@token_required
 def createfolder():
     try:
         data = request.get_json()
@@ -156,15 +158,16 @@ def updatefolders():
             status=500
         ), 500
 
-@folder_bp.route('/folder/update/<id>', methods=['PATCH'])
+@folder_bp.route('/folder/update/<folder_id>', methods=['PATCH'])
 @cross_origin(supports_credentials=True)
-def updatefolder(id):
+@has_folder_rights
+def updatefolder(folder_id):
     '''This method is called when the user wants to update a folder's name.'''
     try:
         data = request.get_json()
         folder_name = data.get('name')
 
-        db.child("folder").child(id).update({
+        db.child("folder").child(folder_id).update({
             "name": folder_name
         })
 
@@ -243,12 +246,13 @@ def updatefolder_progress(folder_id):
         ), 500
 # --------------END CHANGE------------
 
-@folder_bp.route('/folder/delete/<id>', methods=['DELETE'])
+@folder_bp.route('/folder/delete/<folder_id>', methods=['DELETE'])
 @cross_origin(supports_credentials=True)
-def deletefolder(id):
+@has_folder_rights
+def deletefolder(folder_id):
     '''This method is called when the user requests to delete a folder.'''
     try:
-        db.child("folder").child(id).remove()
+        db.child("folder").child(folder_id).remove()
 
         return jsonify(
             message='Folder deleted successfully',
@@ -263,6 +267,7 @@ def deletefolder(id):
 
 @folder_bp.route('/deck/add-deck', methods=['POST'])
 @cross_origin(supports_credentials=True)
+@has_folder_and_deck_rights
 def adddecktofolder():
     '''This method allows the user to add a deck to a folder by folderId and deckId.'''
     try:
@@ -287,6 +292,7 @@ def adddecktofolder():
     
 @folder_bp.route('/deck/get-deck/<folder_id>', methods=['GET'])
 @cross_origin(supports_credentials=True)
+@has_folder_rights
 def get_deck_from_folder(folder_id):
     '''Return decks in a folder'''
     try:
@@ -295,7 +301,12 @@ def get_deck_from_folder(folder_id):
         for fd in folder_deck_ref.each():
             if fd.val().get('deckId') is None:
                 continue
-            deck_list.append(fd.val().get('deckId'))
+            deck_id = fd.val().get('deckId')
+            deck_snapshot = db.child("deck").child(deck_id).get().val()
+            if deck_snapshot is None:
+                continue
+
+            deck_list.append({"id": deck_id, "title": deck_snapshot.get("title")})
         print(deck_list)
 
         return jsonify(
@@ -312,6 +323,7 @@ def get_deck_from_folder(folder_id):
 
 @folder_bp.route('/folder/remove-deck', methods=['DELETE'])
 @cross_origin(supports_credentials=True)
+@has_folder_and_deck_rights
 def removedeckfromfolder():
     '''This method allows the user to remove a deck from a folder by folderId and deckId.'''
     try:
@@ -337,6 +349,7 @@ def removedeckfromfolder():
     
 @folder_bp.route('/decks/<folder_id>', methods=['GET'])
 @cross_origin(supports_credentials=True)
+@has_folder_rights
 def get_decks_for_folder(folder_id):
     '''This method is called to fetch all decks for a specific folder.'''
     try:

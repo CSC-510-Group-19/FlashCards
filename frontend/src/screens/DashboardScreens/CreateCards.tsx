@@ -59,7 +59,8 @@ const CreateCards = () => {
   const [fetchingCards, setFetchingCards] = useState(false);
 
   const flashCardUser = window.localStorage.getItem("flashCardUser");
-  const { localId } = (flashCardUser && JSON.parse(flashCardUser)) || {};
+  const idToken = window.localStorage.getItem("idToken")
+  const { uid } = (flashCardUser && JSON.parse(flashCardUser)) || {};
 
   useEffect(() => {
     fetchDeck();
@@ -71,7 +72,11 @@ const CreateCards = () => {
   const fetchDeck = async () => {
     setFetchingDeck(true);
     await http
-      .get(`/deck/${id}`)
+      .get(`/deck/${id}`, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      })
       .then((res) => {
         const { deck: _deck } = res.data || {};
         setDeck(_deck);
@@ -85,7 +90,11 @@ const CreateCards = () => {
   const fetchCards = async () => {
     setFetchingCards(true);
     await http
-      .get(`/deck/${id}/card/all`)
+      .get(`/deck/${id}/card/all`, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      })
       .then((res) => {
         const { cards } = res.data || {};
         if (cards.length !== 0) {
@@ -127,13 +136,21 @@ const CreateCards = () => {
   const handleAddCards = async (e: any) => {
     e.preventDefault();
     const payload = {
-      localId,
+      uid,
       cards,
     };
     setIsSubmitting(true);
-    await http.patch(`/deck/goal/${id}`, { progress: cards.length });
+    await http.patch(`/deck/goal/${id}`, { progress: cards.length }, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      });
     await http
-      .post(`/deck/${id}/card/create`, payload)
+      .post(`/deck/${id}/card/create`, payload, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      })
       .then((res) => {
         Swal.fire({
           icon: "success",

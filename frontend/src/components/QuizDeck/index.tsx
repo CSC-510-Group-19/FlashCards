@@ -16,6 +16,7 @@ export default function Quiz({ cards }: QuizProps) {
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const { id } = useParams();
   const currentCard = cards[currentCardIndex];
+  const idToken = window.localStorage.getItem('idToken')
 
   useEffect(() => {
     if (currentCard) {
@@ -65,7 +66,11 @@ export default function Quiz({ cards }: QuizProps) {
     if (localId && email) {
       try {
         // Fetch the user's current score for this deck
-        const response = await http.get(`/deck/${id}/user-score/${localId}`);
+        const response = await http.get(`/deck/${id}/user-score/${localId}`, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      });
         const existingScore = response.data?.score["correct"]; // Assuming the score is returned here
         // Only update if the new score is higher than the existing score
         if (finalScore > existingScore || (response.data.score["correct"] === 0 && response.data.score["incorrect"] === 0)) {
@@ -97,8 +102,16 @@ export default function Quiz({ cards }: QuizProps) {
           // Only update if the new score is higher than the existing score
           await http.post('/deck/${id}/user-score/${localId}', {
             deckId: id
-          });
-          await http.post('/folders/all/update', { userId: localId } );
+          }, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      });
+          await http.post('/folders/all/update', { userId: localId }, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      } );
           if (finalScore > existingScore || (response.data.score["correct"] === 0 && response.data.score["incorrect"] === 0)) {
             console.log("inside")
             // if deck is in a folder -> update progress on folder
@@ -122,7 +135,11 @@ export default function Quiz({ cards }: QuizProps) {
 
   const updateQuizGoal = async () => {
     try {
-      await http.patch(`/deck/quizCompleted/${id}`);
+      await http.patch(`/deck/quizCompleted/${id}`, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      });
       console.log(`Quiz goal marked as completed for deck ${id}`);
     } catch (err) {
       console.error(`Error updating quiz goal for deck ${id}:`, err);

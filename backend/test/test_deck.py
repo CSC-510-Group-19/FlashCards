@@ -2,7 +2,7 @@ from flask import Flask
 import sys
 sys.path.append('backend/src')
 import unittest
-from unittest.mock import patch, MagicMock, ANY
+from unittest.mock import patch, MagicMock, ANY, Mock
 import json
 from src.auth.routes import auth_bp
 from src.deck.routes import deck_bp
@@ -17,14 +17,28 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 
 class TestDeck(unittest.TestCase):
+    good_auth_header = {'Authorization': '-auth123'}
+    bad_auth_header = {'Authorization': '-auth1234'}
+    good_auth_response = {"users": [{"localId": "-123"}]}
+    bad_auth_response = {"message": "Invalid token"}
+    mockGoodAuth = Mock(return_value=good_auth_response)
+    mockBadAuth = Mock(return_value=bad_auth_response)
+    mockNoAuth = Mock(return_value={})
+
+    mockUserOwnsFolder = Mock(return_value=True)
+    mockUnauthorized = {"message": "Unauthorized"}, 401
+    mockFolderNotFound = {"message": "Folder not found"}, 404
+    mockUnexpectedResponse = {"message": "Unexpected error"}, 500
+
     @classmethod
     def setUp(self):
         self.app=Flask(__name__, instance_relative_config=False)
         self.app.register_blueprint(deck_bp)
         self.app=self.app.test_client()
         # self.client = self.app.test_client()
-        
-    def test_deck_id_route_get_valid_id(self):
+
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    async def test_deck_id_route_get_valid_id(self):
         '''Test the deck/id route of our app with a valid deck id'''
         with self.app:
             self.app.post('/login', data=json.dumps(dict(email='aaronadb@gmail.com', password='flashcards123')), content_type='application/json', follow_redirects=True)
@@ -32,8 +46,8 @@ class TestDeck(unittest.TestCase):
             response = self.app.get('/deck/Test')
             assert response.status_code == 200
 
-    
-    def test_deck_id_route_post(self):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    async def test_deck_id_route_post(self):
         '''Test the deck/id route of our app with the post method'''
         with self.app:
             self.app.post('/login', data=json.dumps(dict(email='aaronadb@gmail.com', password='flashcards123')), content_type='application/json', follow_redirects=True)
@@ -41,31 +55,47 @@ class TestDeck(unittest.TestCase):
             response = self.app.post('/deck/Test')
             assert response.status_code == 405
 
-    def test_deck_all_route(self):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    async def test_deck_all_route(self):
         '''Test the deck/all route of our app'''
         response=self.app.get('/deck/all',query_string=dict(localId='Test'))
         assert response.status_code==200
 
-    def test_deck_all_route_post(self):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    async def test_deck_all_route_post(self):
         '''Test that the post request to the '/deck/all' route is not allowed'''
         response=self.app.post('/deck/all')
         assert response.status_code==405
 
-    def test_create_deck_route(self):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    async def test_create_deck_route(self):
         '''Test the create deck route of our app'''
         response = self.app.post('/deck/create', data=json.dumps(dict(localId='Test', title='TestDeck', description='This is a test deck', visibility='public')), content_type='application/json')
         assert response.status_code == 201
-    
-    def test_update_deck_route_post(self):
+
+    @patch('src.__init__.get_user_id_from_request', return_value=mockBadAuth)
+    async def test_create_deck_with_invalid_token(self):
+        '''Test the create deck route of our app with an invalid token'''
+        response = self.app.post('/deck/create', data=json.dumps(dict(localId='Test', title='TestDeck', description='This is a test deck', visibility='public')), content_type='application/json')
+        assert response.status_code == 403
+
+    @patch('src.__init__.get_user_id_from_request', return_value=mockNoAuth)
+    async def test_create_deck_with_no_token(self):
+        '''Test the create deck route of our app with an invalid token'''
+        response = self.app.post('/deck/create', data=json.dumps(dict(localId='Test', title='TestDeck', description='This is a test deck', visibility='public')), content_type='application/json')
+        assert response.status_code == 401
+
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    async def test_update_deck_route_post(self):
         '''Test the deck/update route of our app with'''
         with self.app:
             self.app.post('/login', data=json.dumps(dict(email='aaronadb@gmail.com', password='flashcards123')), content_type='application/json', follow_redirects=True)
             self.app.post('/deck/create', data=json.dumps(dict(localId='Test', title='TestDeck', description='This is a test deck', visibility='public')), content_type='application/json')
             response = self.app.patch('/deck/update/Test', data=json.dumps(dict(localId='Test', title='TestDeck', description='This is a test deck', visibility='public')), content_type='application/json')
             assert response.status_code == 201
-        
-   
-    def test_delete_deck_route_post(self):
+
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    async def test_delete_deck_route_post(self):
         '''Test the deck/delete route of our app with'''
         with self.app:
             self.app.post('/login', data=json.dumps(dict(email='aaronadb@gmail.com', password='flashcards123')), content_type='application/json', follow_redirects=True)
@@ -73,9 +103,21 @@ class TestDeck(unittest.TestCase):
             response = self.app.delete('/deck/delete/Test')
             assert response.status_code == 200
 
-   
-    
-    def test_update_last_opened_deck_route_failure(self):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockBadAuth)
+    async def test_delete_deck_with_invalid_token(self):
+        '''Test the deck/delete route of our app with an invalid token'''
+        response = self.app.delete('/deck/delete/Test')
+        assert response.status_code == 403
+
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_deck', return_value=mockUnauthorized)
+    async def test_delete_deck_unauthorized(self):
+        '''Test the deck/delete when unauthorized'''
+        response = self.app.delete('/deck/delete/Test')
+        assert response.status_code == 401
+
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    async def test_update_last_opened_deck_route_failure(self):
         '''Test the deck/updateLastOpened/<id> route of our app with failure scenario'''
         with self.app:
             # Arrange: Mock the database update to raise an exception
@@ -95,7 +137,8 @@ class TestDeck(unittest.TestCase):
                 assert response_data['message'] == 'Failed to update lastOpened: Database update failed'
     
     @patch('src.deck.routes.db')  # Mock the database connection
-    def test_get_leaderboard_route(self, mock_db):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    async def test_get_leaderboard_route(self, mock_db):
         '''Test the deck/<deckId>/leaderboard route of our app'''
         with self.app:
             # Arrange: Set up mock return value for leaderboard entries
@@ -120,7 +163,9 @@ class TestDeck(unittest.TestCase):
             assert response_data['leaderboard'][2]['userEmail'] == "user3@example.com"  # Lowest score
           
     @patch('src.deck.routes.db')  # Mock the database connection
-    def test_update_leaderboard_success(self, mock_db):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_update_leaderboard_success(self, mock_db):
         '''Test the /deck/<deck_id>/update-leaderboard route of our app for a successful update'''
         with self.app:
             # Arrange: Set up mock data
@@ -158,7 +203,10 @@ class TestDeck(unittest.TestCase):
             })
 
     @patch('src.deck.routes.db')  # Mock the database connection
-    def test_get_user_score_success(self, mock_db):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_get_user_score_success(self, mock_db):
         '''Test the /deck/<deckId>/user-score/<userId> route for a successful score fetch'''
         deck_id = "TestDeck"
         user_id = "user123"
@@ -184,7 +232,9 @@ class TestDeck(unittest.TestCase):
         assert response_data['message'] == "User score fetched successfully"
 
     @patch('src.deck.routes.db')  # Mock the database connection
-    def test_get_user_score_no_entry(self, mock_db):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_get_user_score_no_entry(self, mock_db):
         '''Test the /deck/<deckId>/user-score/<userId> route when no score entry exists'''
         deck_id = "TestDeck"
         user_id = "user123"
@@ -207,7 +257,9 @@ class TestDeck(unittest.TestCase):
         assert response_data['message'] == "No score found for the user, returning zeros."
 
     @patch('src.deck.routes.db')  # Mock the database connection
-    def test_get_user_score_error(self, mock_db):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_get_user_score_error(self, mock_db):
         '''Test the /deck/<deckId>/user-score/<userId> route when an error occurs'''
         deck_id = "TestDeck"
         user_id = "user123"
@@ -224,7 +276,9 @@ class TestDeck(unittest.TestCase):
         assert response_data['message'] == "An error occurred: Database error"
 
     @patch('src.deck.routes.db')
-    def test_get_deck_error(self, mock_db):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_get_deck_error(self, mock_db):
         '''Test error handling in getdeck route'''
         # Mock the database to raise an exception
         mock_db.child.return_value.child.return_value.get.side_effect = Exception("Database error")
@@ -236,7 +290,9 @@ class TestDeck(unittest.TestCase):
         assert "An error occurred: Database error" in response_data['message']
 
     @patch('src.deck.routes.db')
-    def test_get_decks_with_cards(self, mock_db):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_get_decks_with_cards(self, mock_db):
         '''Test getdecks route with cards count'''
         # Create mock objects
         mock_deck = MagicMock()
@@ -281,7 +337,9 @@ class TestDeck(unittest.TestCase):
         ], any_order=True)
 
     @patch('src.deck.routes.db')
-    def test_get_decks_error(self, mock_db):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_get_decks_error(self, mock_db):
         '''Test error handling in getdecks route'''
         # Mock the database to raise an exception
         mock_db.child.return_value.order_by_child.return_value.equal_to.side_effect = Exception("Database error")
@@ -293,7 +351,9 @@ class TestDeck(unittest.TestCase):
         assert "An error occurred Database error" in response_data['message']
 
     @patch('src.deck.routes.db')
-    def test_update_deck_error(self, mock_db):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_deck', return_value=True)
+    async def test_update_deck_error(self, mock_db):
         '''Test error handling in update route'''
         # Mock the database to raise an exception
         mock_db.child.return_value.child.return_value.update.side_effect = Exception("Database error")
@@ -311,7 +371,9 @@ class TestDeck(unittest.TestCase):
         assert "Update Deck Failed Database error" in response_data['message']
 
     @patch('src.deck.routes.db')
-    def test_delete_deck_error(self, mock_db):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_deck', return_value=True)
+    async def test_delete_deck_error(self, mock_db):
         '''Test error handling in delete route'''
         # Mock the database to raise an exception
         mock_db.child.return_value.child.return_value.remove.side_effect = Exception("Database error")
@@ -322,7 +384,9 @@ class TestDeck(unittest.TestCase):
         assert "Delete Deck Failed Database error" in response_data['message']
 
     @patch('src.deck.routes.db')
-    def test_get_leaderboard_error(self, mock_db):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_get_leaderboard_error(self, mock_db):
         '''Test error handling in get_leaderboard route'''
         # Mock the database to raise an exception
         mock_db.child.return_value.child.return_value.get.side_effect = Exception("Database error")
@@ -334,7 +398,9 @@ class TestDeck(unittest.TestCase):
         assert "An error occurred: Database error" in response_data['message']
 
     @patch('src.deck.routes.db')
-    def test_update_leaderboard_missing_userid(self, mock_db):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_update_leaderboard_missing_userid(self, mock_db):
         '''Test update_leaderboard route with missing userId'''
         response = self.app.post('/deck/TestDeck/update-leaderboard',
                                data=json.dumps({
@@ -348,7 +414,9 @@ class TestDeck(unittest.TestCase):
         assert response_data['message'] == "User ID is required"
 
     @patch('src.deck.routes.db')
-    def test_update_leaderboard_error(self, mock_db):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_update_leaderboard_error(self, mock_db):
         '''Test error handling in update_leaderboard route'''
         # Mock the database to raise an exception
         mock_db.child.return_value.child.return_value.child.return_value.update.side_effect = Exception("Database error")
@@ -368,7 +436,9 @@ class TestDeck(unittest.TestCase):
     ## Streaks
         
     @patch('src.deck.routes.db.child')
-    def test_get_streak(self, mock_db_child):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_get_streak(self, mock_db_child):
         '''Test getting the streak for a deck'''
         mock_db_child.return_value.child.return_value.get.return_value.val.return_value = {"streak": 5}
         response = self.app.get('/deck/streak/Test')
@@ -377,7 +447,9 @@ class TestDeck(unittest.TestCase):
         self.assertEqual(data['streak'], 5) 
         
     @patch('src.deck.routes.db.child')
-    def test_patch_streak(self, mock_db_child):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_patch_streak(self, mock_db_child):
         '''Test updating the streak for a deck'''
         mock_db_child.return_value.child.return_value.get.return_value.val.return_value = {"streak": 5}
         mock_db_child.return_value.child.return_value.update.return_value = None
@@ -388,7 +460,9 @@ class TestDeck(unittest.TestCase):
         self.assertEqual(data['message'], 'Streak updated')
         
     @patch("src.deck.routes.db.child")
-    def test_get_streak_invalid_deck(self, mock_db_child):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_get_streak_invalid_deck(self, mock_db_child):
         """Test retrieving streak for a non-existent deck."""
         mock_db_child.return_value.child.return_value.get.return_value.val.return_value = None
         response = self.app.get("/deck/streak/InvalidDeck")
@@ -396,14 +470,18 @@ class TestDeck(unittest.TestCase):
         
     
     @patch('src.deck.routes.db.child')
-    def test_patch_streak_invalid_deck(self, mock_db_child):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_patch_streak_invalid_deck(self, mock_db_child):
         """Test updating streak for a non-existent deck."""
         mock_db_child.return_value.child.return_value.get.return_value.val.return_value = None
         response = self.app.patch("/deck/streak/InvalidDeck", data=json.dumps({"streak": 7}), content_type="application/json")
         self.assertEqual(response.status_code, 404)
         
     @patch("src.deck.routes.db.child")
-    def test_patch_streak_invalid_data(self, mock_db_child):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_patch_streak_invalid_data(self, mock_db_child):
         """Test updating the streak with invalid data."""
         invalid_payloads = [
             {"goal": "asdfghjkl"},                                              # random
@@ -421,7 +499,9 @@ class TestDeck(unittest.TestCase):
     ## Goals
         
     @patch('src.deck.routes.db.child')
-    def test_get_goal(self, mock_db_child):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_get_goal(self, mock_db_child):
         '''Test getting the goal for a deck'''
         study_goals = [
             "Study this deck for 20 minutes",
@@ -440,7 +520,9 @@ class TestDeck(unittest.TestCase):
         self.assertEqual(data['goalCompleted'], False)
         
     @patch('src.deck.routes.db.child')
-    def test_patch_goal(self, mock_db_child):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_patch_goal(self, mock_db_child):
         '''Test updating the goal for a deck'''
         mock_db_child.return_value.child.return_value.get.return_value.val.return_value = {
             "goalProgress": 5,
@@ -449,21 +531,27 @@ class TestDeck(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         
     @patch("src.deck.routes.db.child")
-    def test_get_goal_invalid_deck(self, mock_db_child):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_get_goal_invalid_deck(self, mock_db_child):
         """Test retrieving goal for a non-existent deck."""
         mock_db_child.return_value.child.return_value.get.return_value.val.return_value = None
         response = self.app.get("/deck/goal/InvalidDeck")
         self.assertEqual(response.status_code, 404)
         
     @patch("src.deck.routes.db.child")
-    def test_patch_goal_invalid_deck(self, mock_db_child):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_patch_goal_invalid_deck(self, mock_db_child):
         """Test updating goal for a non-existent deck."""
         mock_db_child.return_value.child.return_value.get.return_value.val.return_value = None
         response = self.app.patch("/deck/goal/InvalidDeck", data=json.dumps({"goalCompleted": True}), content_type="application/json")
         self.assertEqual(response.status_code, 404)
         
     @patch("src.deck.routes.db.child")
-    def test_patch_goal_invalid_data(self, mock_db_child):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.deck_is_visible', return_value=True)
+    async def test_patch_goal_invalid_data(self, mock_db_child):
         """Test updating the goal with invalid data."""
         invalid_payloads = [
             {"goal": "asdfghjkl"},                                              # random
@@ -478,7 +566,9 @@ class TestDeck(unittest.TestCase):
             self.assertIn(response.status_code, [400, 422])  # Expecting a bad request or unprocessable entity
     
     @patch('src.deck.routes.db')
-    def test_deck_delete_route(self, mock_cards_db, mock_deck_db, mock_auth):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_deck', return_value=True)
+    async def test_deck_delete_route(self, mock_cards_db, mock_deck_db, mock_auth):
         '''Test the deck/delete/<id> route of our app'''
         responses = []
         response_1 = self.client.get('/deck/all?localId=Test')
@@ -492,7 +582,8 @@ class TestDeck(unittest.TestCase):
             responses.append(response)
         assert 500 not in responses
 
-    def test_create_deck_missing_fields(self):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    async def test_create_deck_missing_fields(self):
         '''Test creating a deck with missing fields'''
         response = self.app.post(
             '/deck/create',
@@ -508,7 +599,9 @@ class TestDeck(unittest.TestCase):
         response_data = json.loads(response.data)
         assert response_data['message'] == 'Missing required fields'
 
-    def test_update_deck_invalid_data(self):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_deck', return_value=True)
+    async def test_update_deck_invalid_data(self):
         '''Test updating a deck with invalid data'''
         response = self.app.patch(
             '/deck/update/Test',
@@ -524,14 +617,18 @@ class TestDeck(unittest.TestCase):
         response_data = json.loads(response.data)
         assert response_data['message'] == 'Invalid data provided'
 
-    def test_delete_deck_non_existent(self):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_deck', return_value=True)
+    async def test_delete_deck_non_existent(self):
         '''Test deleting a non-existent deck'''
         response = self.app.delete('/deck/delete/non_existent_deck')
         assert response.status_code == 404
         response_data = json.loads(response.data)
         assert response_data['message'] == 'Deck not found'
 
-    def test_get_leaderboard_no_entries(self):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_deck', return_value=True)
+    async def test_get_leaderboard_no_entries(self):
         '''Test fetching the leaderboard for a deck with no entries'''
         with patch('src.deck.routes.db.child') as mock_db:
             mock_db.return_value.child.return_value.get.return_value = None
@@ -540,7 +637,9 @@ class TestDeck(unittest.TestCase):
             response_data = json.loads(response.data)
             assert response_data['leaderboard'] == []
 
-    def test_update_leaderboard_missing_fields(self):
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_deck', return_value=True)
+    async def test_update_leaderboard_missing_fields(self):
         '''Test updating the leaderboard with missing fields'''
         response = self.app.post(
             '/deck/TestDeck/update-leaderboard',

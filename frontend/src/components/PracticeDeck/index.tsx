@@ -18,11 +18,17 @@ export default function Flashcard({cards}: any) {
   const [studyTime, setStudyTime] = useState(0);
   const [activeGoal, setActiveGoal] = useState("");
 
+  const idToken = window.localStorage.getItem('idToken')
+
   useEffect(() => {
 
     const fetchGoal = async () => {
       try {
-        const res = await http.get(`/deck/goal/${id}`);
+        const res = await http.get(`/deck/goal/${id}`, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      });
         setActiveGoal(res.data.goal || "");
       } catch (err) {
         console.error("Error fetching goal:", err);
@@ -57,6 +63,10 @@ export default function Flashcard({cards}: any) {
       await http.patch(`/deck/goal/${id}`, {
         goalType: "Study this deck for 20 minutes", // Send goal type
         progress: elapsedTime,
+      }, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
       });
       console.log("Study goal updated:", elapsedTime);
     } catch (err) {
@@ -66,7 +76,11 @@ export default function Flashcard({cards}: any) {
 
   const updateStreak = async () => {
     try {
-      await http.patch(`/deck/streak/${id}`, {});
+      await http.patch(`/deck/streak/${id}`, {}, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      });
       console.log("Streak updated successfully");
     } catch (err) {
       console.error("Error updating streak:", err);
