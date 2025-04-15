@@ -159,7 +159,14 @@ def delete(id):
     '''This method is called when the user requests to delete the deck. Only the deckid is required to delete the deck.'''
     try:
         db.child("deck").child(id).remove()
-        
+        # Query folder_decks
+        folder_decks = db.child("folder_deck").get()
+        if folder_decks.each():
+            for item in folder_decks.each():
+                folder_deck_id = item.key()
+                folder_deck_data = item.val()
+                if folder_deck_data.get("deckId") == id:
+                    db.child("folder_deck").child(folder_deck_id).remove()
         return jsonify(
             message = 'Delete Deck Successful',
             status = 200

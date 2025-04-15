@@ -6,9 +6,6 @@ import { Route, Routes, useLocation } from 'react-router'
 import { authRoutes, dashboardRoutes, homeRoutes, publicRoutes } from './routes'
 import "swiper/css/bundle";
 import 'bootstrap/dist/css/bootstrap.css';
-import './initializeFirebase'
-import { getAuth, onAuthStateChanged, getIdToken } from "firebase/auth";
-import http from "utils/api"
 
 const App = () => {
   const location = useLocation()

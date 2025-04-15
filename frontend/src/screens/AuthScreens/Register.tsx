@@ -28,6 +28,7 @@ import Swal from "sweetalert2";
 import http from "utils/api";
 import "./styles.scss";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import OAuthOptions from "components/OAuthOptions";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -102,6 +103,8 @@ const Register = () => {
                   <button className="btn btn-main btn-block mb-3" type="submit">
                     {isSubmitting ? 'Creating Account...' : 'Create Account'}
                   </button>
+                  <h3>Or Sign Up</h3>
+                  <OAuthOptions ></OAuthOptions>
                   <p>
                     Already have an account? <Link to="/login">Login</Link>
                   </p>

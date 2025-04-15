@@ -301,7 +301,12 @@ def get_deck_from_folder(folder_id):
         for fd in folder_deck_ref.each():
             if fd.val().get('deckId') is None:
                 continue
-            deck_list.append(fd.val().get('deckId'))
+            deck_id = fd.val().get('deckId')
+            deck_snapshot = db.child("deck").child(deck_id).get().val()
+            if deck_snapshot is None:
+                continue
+
+            deck_list.append({"id": deck_id, "title": deck_snapshot.get("title")})
         print(deck_list)
 
         return jsonify(
