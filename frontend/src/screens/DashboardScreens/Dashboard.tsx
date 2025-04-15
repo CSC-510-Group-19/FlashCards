@@ -207,11 +207,11 @@ const Dashboard = () => {
 
   const handleDeleteFolder = async (id: string) => {
     try {
-      await http.delete(`/folder/delete/${id}`), {
+      await http.delete(`/folder/delete/${id}`, {
         headers: {
           'Authorization': `${idToken}`
         }
-      };
+      });
       Swal.fire("Folder Deleted Successfully!", "", "success").then(() => fetchFolders());
     } catch (err) {
       Swal.fire("Folder Deletion Failed!", "", "error");
