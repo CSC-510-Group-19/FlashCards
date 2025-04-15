@@ -205,6 +205,15 @@ const Dashboard = () => {
     }
   };
 
+  const handleDeleteFolder = async (id: string) => {
+    try {
+      await http.delete(`/folder/delete/${id}`);
+      Swal.fire("Folder Deleted Successfully!", "", "success").then(() => fetchFolders());
+    } catch (err) {
+      Swal.fire("Folder Deletion Failed!", "", "error");
+    }
+  };
+
   const handleAddDeckToFolder = async (deckId: string, folderId: string) => {
     try {
       await http.post("/deck/add-deck", { deckId, folderId }, {
@@ -285,15 +294,30 @@ const Dashboard = () => {
                 <div key={folder.id} className="col-md-4">
                   <div className="folder-container" onClick={() => handleFolderClick(folder)}>
                     <h5>{folder.name}</h5>
+                    {/* Wrapper to stop propagation from entire popconfirm block */}
+                      
                     <p>{folder.decks.length > 0 ? `${folder.decks.length} deck(s)` : null}</p>
                     {
                       folder.decks.length > 0 ?
                       <div className="menu" style={{width: "100px", height: "100px"}}>
                         <CircularProgressbar className="progress-circle" value={folder.progress || 0} text={`${folder.progress || 0}%`} />
                       </div>
+                      
                       : null
                     }
                       <p>{folder.decks.length === 0 ? `${folder.decks.length} deck(s)` : null}</p>
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Popconfirm
+                          title="Are you sure to delete this folder?"
+                          onConfirm={() => handleDeleteFolder(folder.id)}
+                          okText="Yes"
+                          cancelText="No"
+                        >
+                          <button className="btn text-danger">
+                            <i className="lni lni-trash-can"></i> Delete
+                          </button>
+                        </Popconfirm>
+                      </div>
                     </div>
                 </div>
               ))
