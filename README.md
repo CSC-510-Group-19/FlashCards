@@ -47,7 +47,7 @@ FlashCards is a spaced repetition learning platform to <b>create</b>, <b>memoriz
 ## Watch Flashcards in Action
 [Watch FlashCards Video](./images/FlashCards-2.mp4)
 
-[NEW AND IMPROVED](https://youtu.be/VrMM3mXynM0)
+[NEW AND IMPROVED](https://www.youtube.com/watch?v=X5rcmLUoyFQ)
 
 <details>
 
@@ -79,9 +79,13 @@ FlashCards is a spaced repetition learning platform to <b>create</b>, <b>memoriz
 <a href="https://www.heroku.com/"><img src="https://img.shields.io/badge/Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white" /></a>
 
 ## Getting started & Installation:
-- Backend [See README.md](https://github.com/CSC-510-Group-19/FlashCards/blob/main/backend/Readme.md)
-- Frontend [See README.md](https://github.com/CSC-510-Group-19/FlashCards/blob/main/frontend/README.md)
+- Backend [See README.md](backend/Readme.md)
+- Frontend [See README.md](frontend/README.md)
 
+## New Features
+- Enhanced endpoint security
+- OAuth Integration (Sign in with Google, GitHub, or Facebook)
+- Folder Management
 
 <!-- ## Future Roadmap [See here](https://github.com/users/CSC-510-Group-19/projects/1) -->
 
@@ -99,28 +103,24 @@ FlashCards is a spaced repetition learning platform to <b>create</b>, <b>memoriz
 - [ ] Chrome Extension feature that enables users to highlight text on websites or online PDFs and instantly create flashcards from their selections.-->
 
 ## Contributions to the Project
-Please refer to the [Contributing.md](https://github.com/CSC-510-Group-19/FlashCards/blob/main/Contributing.md) if you want to contrbute to the FlashCards source code. Follow all the guidelines mentioned and raise a pull request for the developers to review before the code goes to the main source code.
+Please refer to the [Contributing.md](Contributing.md) if you want to contrbute to the FlashCards source code. Follow all the guidelines mentioned and raise a pull request for the developers to review before the code goes to the main source code.
 
 ## Help
 
 Email any queries to the contributors -
-1. [Haven Brown](hbrown4@ncsu.edu)
-2. [Trent Wiens](twiens@ncsu.edu)
-3. [Abhinav Sharma](asharm67@ncsu.edu)
+1. [Jonathan Kurian](jgkurian@ncsu.edu)
+2. [Eleanor Maye](edmaye@ncsu.edu)
+3. [Mulikatu Yakubu](Miyakubu@ncsu.edu)
 
 ## Authors 
 
-1. [Haven Brown](https://github.com/havenbrown1108)
-2. [Trent Wiens](https://github.com/Trent-Wiens)
-3. [Abhinav Sharma](https://github.com/ABHINAVSHARMA8)
+1. [Jonathan Kurian](jgkurian@ncsu.edu)
+2. [Eleanor Maye](edmaye@ncsu.edu)
+3. [Mulikatu Yakubu](Miyakubu@ncsu.edu)
 
 
 ## License
-[MIT](https://github.com/CSC-510-Group-19/FlashCards/blob/main/LICENSE)
-
-## References
-It was recommended we clone the original repo for this project rather than fork it. To view the repository
-this project started with go see: [SE-Fall24-RZA](https://github.com/SE-Fall24-RZA/FlashCards/tree/main).
+[MIT](LICENSE)
 
 ## Funding
 Our project at the moment is not funded by any organization/individual.
