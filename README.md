@@ -28,8 +28,6 @@
 <img src="https://img.shields.io/tokei/lines/github/CSC-510-Group-19/flashcards?style=plastic">
 <a href="https://github.com/CSC-510-Group-19/FlashCards/issues">
   <img src="https://img.shields.io/github/issues-raw/CSC-510-Group-19/flashcards?style=plastic"></a>
-<a href="https://img.shields.io/github/release/CSC-510-Group-19/FlashCards?color=brightblue" alt="Release">
-<img src="https://img.shields.io/github/release/CSC-510-Group-19/FlashCards?color=brightblue"/> </a>
 </p>
 
 ## Description
