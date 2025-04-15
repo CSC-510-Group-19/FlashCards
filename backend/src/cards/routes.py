@@ -27,9 +27,9 @@ from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
 
 try:
-    from .. import firebase
+    from .. import firebase, deck_is_visible, has_deck_rights, get_user_id_from_request
 except ImportError:
-    from __init__ import firebase
+    from __init__ import firebase, deck_is_visible, has_deck_rights
 
 card_bp = Blueprint(
     'card_bp', __name__
@@ -38,12 +38,13 @@ card_bp = Blueprint(
 db = firebase.database()
 
 
-@card_bp.route('/deck/<deckId>/card/all', methods = ['GET'])
+@card_bp.route('/deck/<deck_id>/card/all', methods = ['GET'])
 @cross_origin(supports_credentials=True)
-def getcards(deckId):
+@deck_is_visible
+def getcards(deck_id):
     '''This method is called when the user want to fetch all of the cards in a deck. Only the deckid is required to fetch all cards from the required deck.'''
     try:
-        user_cards = db.child("card").order_by_child("deckId").equal_to(deckId).get()
+        user_cards = db.child("card").order_by_child("deckId").equal_to(deck_id).get()
         cards = [card.val() for card in user_cards.each()]
         return jsonify(
             cards = cards,
@@ -58,18 +59,19 @@ def getcards(deckId):
         ), 500
 
 
-@card_bp.route('/deck/<deckId>/card/create', methods = ['POST'])
+@card_bp.route('/deck/<deck_id>/card/create', methods = ['POST'])
 @cross_origin(supports_credentials=True)
-def createcards(deckId):
+@has_deck_rights
+def createcards(deck_id):
     '''This method is routed when the user requests to create new cards in a deck. 
     Only the deckid is required to add cards to a deck.'''
     try:
         data = request.get_json()
-        localId = data['localId']
+        localId = get_user_id_from_request()
         cards = data['cards']
         
         '''remove existing cards'''
-        previous_cards = db.child("card").order_by_child("deckId").equal_to(deckId).get()
+        previous_cards = db.child("card").order_by_child("deckId").equal_to(deck_id).get()
         for card in previous_cards.each():
             db.child("card").child(card.key()).remove()
         
@@ -77,7 +79,7 @@ def createcards(deckId):
         for card in cards:
             db.child("card").push({
                 "userId": localId,
-                "deckId": deckId,
+                "deckId": deck_id,
                 "front": card['front'], 
                 "back": card['back'],
                 "hint": card['hint']
@@ -93,11 +95,12 @@ def createcards(deckId):
             status = 500
         ), 500
     
-@card_bp.route('/deck/<deckId>/public/card/create', methods = ['POST'])
+@card_bp.route('/deck/<deck_id>/public/card/create', methods = ['POST'])
 @cross_origin(supports_credentials=True)
-def create_public_cards(deckId):
+@has_deck_rights
+def create_public_cards(deck_id):
     '''This method is routed when the user requests to create new cards in a public deck. 
-    Only the deckid is required to add cards to a deck.'''
+    Only the deck_id is required to add cards to a deck.'''
     try:
         data = request.get_json()
         cards = data['cards']
@@ -105,7 +108,7 @@ def create_public_cards(deckId):
         '''add new cards'''
         for card in cards:
             db.child("card").push({
-                "deckId": deckId,
+                "deckId": deck_id,
                 "front": card['front'], 
                 "back": card['back'],
                 "hint": card['hint']
@@ -123,14 +126,15 @@ def create_public_cards(deckId):
         ), 500
 
 
-@card_bp.route('/deck/<id>/update/<cardid>', methods = ['PATCH'])
+@card_bp.route('/deck/<deck_id>/update/<cardid>', methods = ['PATCH'])
 @cross_origin(supports_credentials=True)
-def updatecard(id,cardid):
+@has_deck_rights
+def updatecard(deck_id,cardid):
     '''This method is called when the user requests to update cards in a deck. The card can be updated in terms of its word and meaning.
     Here deckid and cardid is required to uniquely identify a updating card.'''
     try:
         data = request.get_json()
-        deckid = id
+        deckid = deck_id
         cardid=cardid
         word = data['word']
         meaning = data['meaning']
@@ -150,16 +154,17 @@ def updatecard(id,cardid):
         ), 500
  
 
-@card_bp.route('/deck/<id>/delete/<cardid>', methods = ['DELETE'])
+@card_bp.route('/deck/<deck_id>/delete/<cardid>', methods = ['DELETE'])
 @cross_origin(supports_credentials=True)
-def deletecard(id,cardid):
+@has_deck_rights
+def deletecard(deck_id,cardid):
     '''This method is called when the user requests to delete the card. The deckid and the particular cardid is required to delete the card.'''
     try:
         data = request.get_json()
-        deckid = id
+        deckid = deck_id
         cardid=cardid
         
-        db.child("card").order_by_child("Id").equal_to(f"{deckid}_{cardid}").remove()
+        db.child("card").order_by_child("Id").equal_to(f"{deck_id}_{cardid}").remove()
         
         return jsonify(
             message = 'Delete Card Successful',

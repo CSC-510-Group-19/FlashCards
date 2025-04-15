@@ -1,6 +1,9 @@
+from firebase_admin import auth
 from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
 from datetime import datetime
+
+from ..api import token_required
 
 try:
     from .. import firebase
@@ -12,6 +15,7 @@ db = firebase.database()
 
 @user_bp.route('/user/<user_id>/streak', methods=['GET'])
 @cross_origin(supports_credentials=True)
+@token_required
 def get_streak(user_id):
     '''Get the user's current streak'''
     try:
@@ -56,9 +60,16 @@ def get_streak(user_id):
                     
 @user_bp.route('/user/<user_id>/update-streak', methods=['PATCH'])
 @cross_origin(supports_credentials=True)
+@token_required
 def update_streak(user_id):
     '''Update streak after the user accesses a deck'''
-    try: 
+    try:
+        token = request.headers.get("Authorization");
+        if token:
+            decoded_token = auth.verify_id_token(token);
+            if decoded_token["uid"] != user_id:
+                return jsonify(message="Unauthorized access", status=403), 403
+
         user_data = db.child("users").child(user_id).get()
         current_streak = user_data.val().get("streak", 0) if user_data.val() else 0
         last_study_date = user_data.val().get("lastStudyDate")

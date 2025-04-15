@@ -21,7 +21,10 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #SOFTWARE.
 
-from flask import Flask
+from functools import wraps
+
+from firebase_admin import auth
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 def create_app():
@@ -54,6 +57,30 @@ CORS(app, support_credentials=True)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 app.debug = True
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        if not token:
+            return jsonify({'message': 'No Authorization Token found'}), 401
+
+        # token validator
+        try:
+            decoded_token = auth.verify_id_token(token)
+            uid = decoded_token['uid']
+            # Token is valid
+        except auth.InvalidIdTokenError as e:
+            # Token is invalid
+            return jsonify({"message": "Invalid token: " + e.message}), 401
+        except auth.UserDisabledError as e:
+            # Token belongs to a disabled user record
+            return jsonify({"Message": "User disabled: " + e.message}), 401
+
+        return f(*args, **kwargs)
+
+    return decorated
 
 if __name__ == '__main__':
     app.config.from_mapping({
