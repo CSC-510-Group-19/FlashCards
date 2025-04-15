@@ -7,10 +7,10 @@
 </p>
 <p align="center">
   <a href="https://github.com/CSC-510-Group-19/FlashCards/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/ellie-not-found /flashcards?style=plastic"></a>
-  <img src="https://img.shields.io/github/languages/count/ellie-not-found /flashcards">
+    <img src="https://img.shields.io/github/license/CSC-510-Group-19/flashcards?style=plastic"></a>
+  <img src="https://img.shields.io/github/languages/count/CSC-510-Group-19/flashcards">
   <a href="https://github.com/CSC-510-Group-19/FlashCards/graphs/contributors" alt="Contributors">
-<img src="https://img.shields.io/github/contributors/ellie-not-found /FlashCards?style=plastic"/> </a>
+<img src="https://img.shields.io/github/contributors/CSC-510-Group-19/FlashCards?style=plastic"/> </a>
 
 <a href="https://github.com/WolfByteCollective/FlashCards/actions/workflows/Application.yml" alt="Python application">
 <img src="https://github.com/WolfByteCollective/FlashCards/actions/workflows/Application.yml/badge.svg?style=plastic?branch=main"/> </a>
@@ -22,14 +22,14 @@
 <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.14931596.svg"/> </a>
 <a href="https://img.shields.io/badge/python-v3.8+-yellow.svg" alt="Python version">
 <img src="https://img.shields.io/badge/python-v3.8+-yellow.svg"/> </a>
-<a href="https://img.shields.io/github/repo-size/ellie-not-found /FlashCards?color=brightgreen" alt="Repo size">
-<img src="https://img.shields.io/github/repo-size/ellie-not-found /FlashCards?color=brightgreen"/> </a>
-<img src="https://img.shields.io/github/languages/top/ellie-not-found /Flashcards?style=plastic">
-<img src="https://img.shields.io/tokei/lines/github/ellie-not-found /flashcards?style=plastic">
+<a href="https://img.shields.io/github/repo-size/CSC-510-Group-19/FlashCards?color=brightgreen" alt="Repo size">
+<img src="https://img.shields.io/github/repo-size/CSC-510-Group-19/FlashCards?color=brightgreen"/> </a>
+<img src="https://img.shields.io/github/languages/top/CSC-510-Group-19/Flashcards?style=plastic">
+<img src="https://img.shields.io/tokei/lines/github/CSC-510-Group-19/flashcards?style=plastic">
 <a href="https://github.com/CSC-510-Group-19/FlashCards/issues">
-  <img src="https://img.shields.io/github/issues-raw/ellie-not-found /flashcards?style=plastic"></a>
-<a href="https://img.shields.io/github/release/ellie-not-found /FlashCards?color=brightblue" alt="Release">
-<img src="https://img.shields.io/github/release/ellie-not-found /FlashCards?color=brightblue"/> </a>
+  <img src="https://img.shields.io/github/issues-raw/CSC-510-Group-19/flashcards?style=plastic"></a>
+<a href="https://img.shields.io/github/release/CSC-510-Group-19/FlashCards?color=brightblue" alt="Release">
+<img src="https://img.shields.io/github/release/CSC-510-Group-19/FlashCards?color=brightblue"/> </a>
 </p>
 
 ## Description
@@ -83,7 +83,7 @@ FlashCards is a spaced repetition learning platform to <b>create</b>, <b>memoriz
 - Frontend [See README.md](https://github.com/CSC-510-Group-19/FlashCards/blob/main/frontend/README.md)
 
 
-<!-- ## Future Roadmap [See here](https://github.com/users/ellie-not-found /projects/1) -->
+<!-- ## Future Roadmap [See here](https://github.com/users/CSC-510-Group-19/projects/1) -->
 
 ## Suggested Future Features (see [poster](https://github.com/CSC-510-Group-19/FlashCards/blob/main/images/Poster_Project2.pdf) for more information)
 - [ ] Add a folder deletion function
