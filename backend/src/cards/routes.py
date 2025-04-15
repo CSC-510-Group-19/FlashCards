@@ -67,7 +67,7 @@ def createcards(deck_id):
     Only the deckid is required to add cards to a deck.'''
     try:
         data = request.get_json()
-        localId = get_user_id_from_request()
+        localId = data['uid']
         cards = data['cards']
         
         '''remove existing cards'''

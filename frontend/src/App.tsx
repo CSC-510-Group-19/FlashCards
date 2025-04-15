@@ -16,7 +16,8 @@ const App = () => {
   }, [location])
 
   const flashCardUser = window.localStorage.getItem('flashCardUser');
-  const isAuth = flashCardUser && JSON.parse(flashCardUser) ? true : false;
+  const idToken = window.localStorage.getItem('idToken')
+  const isAuth = idToken ? true : false;
 
   const auth = getAuth()
   onAuthStateChanged(auth, (user) => {
@@ -26,6 +27,7 @@ const App = () => {
         // Send the ID token to your backend or use it for other purposes
         console.log(idToken);
         window.localStorage.setItem('idToken', idToken);
+        window.localStorage.setItem('flashCardUser', JSON.stringify(user))
       }).catch((error) => {
         // Handle error
         console.error(error);
