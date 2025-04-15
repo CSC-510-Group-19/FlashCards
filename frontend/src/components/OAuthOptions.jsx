@@ -1,7 +1,7 @@
 import { Container, Col, Row } from "react-bootstrap";
 import githubIcon from '../assets/images/sso/github.png';
 import googleIcon from '../assets/images/sso/googleSignIn.png';
-import appleIcon from '../assets/images/sso/applelogin.png';
+import facebookIcon from '../assets/images/sso/facebooklogin.png';
 import { signInWithProvider } from '../api/auth.tsx';
 
 const OAuthOptions = () => {
@@ -20,7 +20,7 @@ const OAuthOptions = () => {
     position: 'relative'}}onClick={() => signInWithProvider('google')} />
         </Col>
         <Col xs="auto">
-          <img src={appleIcon} alt="Apple Login" style={{ height: '100px', width: '100px', cursor: 'pointer', zIndex: 1000,
+          <img src={facebookIcon} alt="facebook Login" style={{ height: '100px', width: '100px', cursor: 'pointer', zIndex: 1000,
     position: 'relative'}} onClick={() => signInWithProvider('facebook')} />
         </Col>
       </Row>
