@@ -87,12 +87,11 @@ FlashCards is a spaced repetition learning platform to <b>create</b>, <b>memoriz
 
 <!-- ## Future Roadmap [See here](https://github.com/users/CSC-510-Group-19/projects/1) -->
 
-## Suggested Future Features (see [poster](https://github.com/CSC-510-Group-19/FlashCards/blob/main/images/Poster_Project2.pdf) for more information)
-- [ ] Add a folder deletion function
-- [ ] Improve API Authentication
-- [ ] Improve Sign-up and Log-in Options
-- [ ] Use LLM for Automatic Flashcard Creation
-- [ ] Add More Study Goals
+## Suggested Future Features (see [poster]([https://github.com/CSC-510-Group-19/FlashCards/blob/develop/images/Project%203%20Flashcards%20Poster.png) for more information)
+- [] Additional Quizzes
+- [] Authentication Linking
+- [] Deck Ratings
+- [] New Study Goals
 
 <!-- ### Phase 1:
 - [ ] Add a dashboard providing insights on study habits, quiz results over time, and areas needing improvement, helping users to plan their study strategy.
