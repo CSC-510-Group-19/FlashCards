@@ -18,8 +18,8 @@
 <a href="https://github.com/CSC-510-Group-19/FlashCards/actions/workflows/codecov.yml" alt="Codecov">
 <img src="https://codecov.io/github/WolfByteCollective/FlashCards/branch/main/graph/badge.svg"/> </a>
 
-<a href="https://doi.org/10.5281/zenodo.14931596" alt="DOI">
-<img src="https://zenodo.org/badge/DOI/10.5281/zenodo.14931596.svg"/> </a>
+<a href="https://doi.org/10.5281/zenodo.15224088" alt="DOI">
+<img src="https://zenodo.org/badge/DOI/10.5281/zenodo.15224088.svg"/> </a>
 <a href="https://img.shields.io/badge/python-v3.8+-yellow.svg" alt="Python version">
 <img src="https://img.shields.io/badge/python-v3.8+-yellow.svg"/> </a>
 <a href="https://img.shields.io/github/repo-size/CSC-510-Group-19/FlashCards?color=brightgreen" alt="Repo size">
