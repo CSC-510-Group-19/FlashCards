@@ -22,6 +22,7 @@ class CardTestApp(unittest.TestCase):
     mockGoodAuth = Mock(return_value=good_auth_response)
     mockBadAuth = Mock(return_value=bad_auth_response)
     mockNoAuth = Mock(return_value={})
+    mockUnauthorized = Mock(return_value={"message": "Unauthorized"})
 
     @classmethod
     def setUpClass(cls):
@@ -222,6 +223,41 @@ class CardTestApp(unittest.TestCase):
     @patch('src.deck.routes.db')
     @patch('src.cards.routes.db')
     @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    async def test_create_cards_deck_not_found(self, mock_cards_db, mock_deck_db, mock_auth):
+        '''Test the error handling of createcards method'''
+        mock_deck_db.child.return_value.push.side_effect = None
+        response = self.client.post(
+            '/deck/Test/card/create',
+            data=json.dumps({
+                'localId': 'Test',
+                'cards': [{'front': 'front', 'back': 'back', 'hint': 'hint'}]
+            })
+        )
+        self.assertEqual(response.status_code, 404)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'Deck not found')
+
+    @patch('src.auth.routes.auth')
+    @patch('src.deck.routes.db')
+    @patch('src.cards.routes.db')
+    @patch('src.__init__.get_user_id_from_request', return_value=mockBadAuth)
+    async def test_create_cards_invalid_token(self, mock_cards_db, mock_deck_db, mock_auth):
+        '''Test the error handling of createcards method'''
+        response = self.client.post(
+            '/deck/Test/card/create',
+            data=json.dumps({
+                'localId': 'Test',
+                'cards': [{'front': 'front', 'back': 'back', 'hint': 'hint'}]
+            })
+        )
+        self.assertEqual(response.status_code, 401)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'Invalid token')
+
+    @patch('src.auth.routes.auth')
+    @patch('src.deck.routes.db')
+    @patch('src.cards.routes.db')
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
     @patch('src.__init__.user_owns_deck', return_value=True)
     async def test_update_card(self, mock_cards_db, mock_deck_db, mock_auth):
         '''Test the update card functionality'''
@@ -301,6 +337,23 @@ class CardTestApp(unittest.TestCase):
         response = self.client.delete('/deck/Test/card/create')
         self.assertEqual(response.status_code, 405)
 
+    @patch('src.__init__.get_user_id_from_request', return_value=mockBadAuth)
+    async def test_delete_card_invalid_token(self):
+        '''Test invalid HTTP methods for routes'''
+        response = self.client.delete('/deck/Test/card/delete')
+        self.assertEqual(response.status_code, 401)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'Invalid token')
+
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_deck', return_value=mockUnauthorized)
+    async def test_delete_card_unauthorized(self):
+        '''Test invalid HTTP methods for routes'''
+        response = self.client.delete('/deck/Test/card/delete')
+        self.assertEqual(response.status_code, 401)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'Unauthorized')
+
     @patch('src.deck.routes.db')
     @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
     @patch('src.__init__.user_owns_deck', return_value=True)
@@ -335,6 +388,36 @@ class CardTestApp(unittest.TestCase):
         data = json.loads(response.data)
         self.assertEqual(data['message'], 'Invalid data provided')
 
+    @patch('src.__init__.get_user_id_from_request', return_value=mockBadAuth)
+    async def test_update_card_invalid_token(self):
+        '''Test updating a card with invalid token'''
+        response = self.client.patch(
+            '/deck/test_deck/update/test_card',
+            data=json.dumps({
+                'word': '',
+                'meaning': 'updated_meaning'
+            })
+        )
+        self.assertEqual(response.status_code, 401)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'Invalid token')
+
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_deck', return_value=mockUnauthorized)
+    async def test_update_card_invalid_data(self):
+        '''Test updating a card with invalid data'''
+        response = self.client.patch(
+            '/deck/test_deck/update/test_card',
+            data=json.dumps({
+                'word': '',
+                'meaning': 'updated_meaning'
+            })
+        )
+        self.assertEqual(response.status_code, 401)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'Unauthorized')
+
+
 
     @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
     @patch('src.__init__.user_owns_deck', return_value=True)
@@ -344,6 +427,24 @@ class CardTestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         data = json.loads(response.data)
         self.assertEqual(data['message'], 'Card not found')
+
+    @patch('src.__init__.get_user_id_from_request', return_value=mockBadAuth)
+    async def test_delete_card_invalid_token(self):
+        '''Test deleting a card with invalid token'''
+        response = self.client.delete('/deck/test_deck/delete/invalid_token')
+        self.assertEqual(response.status_code, 401)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'Invalid token')
+
+
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_deck', return_value=mockUnauthorized)
+    async def test_delete_card_invalid_token(self):
+        '''Test deleting a card with invalid token'''
+        response = self.client.delete('/deck/test_deck/delete/invalid_token')
+        self.assertEqual(response.status_code, 401)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'Unauthorized')
 
 
     @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)

@@ -87,6 +87,17 @@ class TestFolders(unittest.TestCase):
         assert "Failed to create folder" in response_data['message']
 
     @patch('src.folders.routes.db')
+    @patch('src.__init__.get_user_id_from_request', return_value=mockBadAuth)
+    async def test_create_folder_invalid_auth(self, mock_db):
+        '''Test folder creation failure due to invalid auth'''
+        folder_data = {"userId": "test_user_id"}
+        response = self.app.post('/folder/create', data=json.dumps(folder_data), content_type='application/json')
+        assert response.status_code == 401
+        response_data = json.loads(response.data)
+        assert "Invalid token" in response_data['message']
+
+
+    @patch('src.folders.routes.db')
     @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
     @patch('src.__init__.user_owns_folder', return_value=mockUserOwnsFolder)
     async def test_update_folder_success(self, mock_db):
@@ -117,6 +128,34 @@ class TestFolders(unittest.TestCase):
 
     @patch('src.folders.routes.db')
     @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    async def test_update_folder_not_found(self, mock_db):
+        '''Test update failure when folder not found'''
+        folder_id = "folder_id"
+        folder_data = {"name": "Updated Folder Name"}
+        mock_db.child.return_value.child.return_value.update.side_effect = Exception("Folder not found")
+
+        response = self.app.patch(f'/folder/update/{folder_id}', data=json.dumps(folder_data), content_type='application/json')
+        assert response.status_code == 404
+        response_data = json.loads(response.data)
+        assert "Folder not found" in response_data['message']
+
+    @patch('src.folders.routes.db')
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_folder', return_value=mockUserOwnsFolder)
+    async def test_unauthorized_folder_update(self, mock_db):
+        '''Test unauthorized folder update'''
+        folder_id = "folder_id"
+        folder_data = {"name": "Updated Folder Name"}
+
+        response = self.app.patch(f'/folder/update/{folder_id}', data=json.dumps(folder_data), content_type='application/json')
+
+        assert response.status_code == 401
+        response_data = json.loads(response.data)
+        assert "Unauthorized" in response_data['message']
+
+
+    @patch('src.folders.routes.db')
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
     @patch('src.__init__.user_owns_folder', return_value=mockUserOwnsFolder)
     async def test_delete_folder_success(self, mock_db):
         '''Test successful folder deletion'''
@@ -142,6 +181,18 @@ class TestFolders(unittest.TestCase):
 
     @patch('src.folders.routes.db')
     @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    async def test_delete_folder_not_found(self, mock_db):
+        '''Test update failure when folder not found'''
+        folder_id = "folder_id"
+        mock_db.child.return_value.child.return_value.update.side_effect = Exception("Folder not found")
+
+        response = self.app.delete(f'/folder/delete/{folder_id}')
+        assert response.status_code == 404
+        response_data = json.loads(response.data)
+        assert "Folder not found" in response_data['message']
+
+    @patch('src.folders.routes.db')
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
     async def test_add_deck_to_folder_success(self, mock_db):
         '''Test successful addition of a deck to a folder'''
         deck_data = {"folderId": "folder_id", "deckId": "deck_id"}
@@ -149,6 +200,17 @@ class TestFolders(unittest.TestCase):
         assert response.status_code == 201
         response_data = json.loads(response.data)
         assert response_data['message'] == 'Deck added to folder successfully'
+
+    @patch('src.folders.routes.db')
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_folder', return_value=mockUnauthorized)
+    async def test_add_deck_to_folder_error(self, mock_db):
+        '''Test unauthorized addition of a deck to a folder'''
+        deck_data = {"folderId": "folder_id", "deckId": "deck_id"}
+        response = self.app.post('/deck/add-deck', data=json.dumps(deck_data), content_type='application/json')
+        assert response.status_code == 401
+        response_data = json.loads(response.data)
+        assert "Unauthorized" in response_data['message']
 
     @patch('src.folders.routes.db')
     @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
@@ -184,6 +246,43 @@ class TestFolders(unittest.TestCase):
         assert response.status_code == 500
         response_data = json.loads(response.data)
         assert "Failed to remove deck from folder" in response_data['message']
+
+    @patch('src.folders.routes.db')
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_folder', return_value=mockUnauthorized)
+    async def test_remove_deck_from_folder_error(self, mock_db):
+        '''Test unauthorized removal of a deck from a folder'''
+        deck_data = {"folderId": "folder_id", "deckId": "deck_id"}
+
+        response = self.app.delete('/folder/remove-deck', data=json.dumps(deck_data), content_type='application/json')
+        assert response.status_code == 401
+        response_data = json.loads(response.data)
+        assert "Unauthorized" in response_data['message']
+
+    @patch('src.folders.routes.db')
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    async def test_remove_deck_from_folder_folder_not_found(self, mock_db):
+        '''Test unauthorized removal of a deck from a non-existent folder'''
+        deck_data = {"folderId": "folder_id", "deckId": "deck_id"}
+        mock_db.child.return_value.order_by_child.return_value.equal_to.return_value.get.side_effect = None
+
+        response = self.app.delete('/folder/remove-deck', data=json.dumps(deck_data), content_type='application/json')
+        assert response.status_code == 404
+        response_data = json.loads(response.data)
+        assert "Folder not found" in response_data['message']
+
+    @patch('src.folders.routes.db')
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_folder', return_value=mockUserOwnsFolder)
+    async def test_remove_deck_from_folder_deck_not_found(self, mock_db):
+        '''Test unauthorized removal of a deck from a non-existent deck'''
+        deck_data = {"folderId": "folder_id", "deckId": "deck_id"}
+        mock_db.child.return_value.order_by_child.return_value.equal_to.return_value.get.side_effect = None
+
+        response = self.app.delete('/folder/remove-deck', data=json.dumps(deck_data), content_type='application/json')
+        assert response.status_code == 404
+        response_data = json.loads(response.data)
+        assert "Folder not found" in response_data['message']
 
     @patch('src.folders.routes.db')
     @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)

@@ -73,6 +73,18 @@ class TestDeck(unittest.TestCase):
         response = self.app.post('/deck/create', data=json.dumps(dict(localId='Test', title='TestDeck', description='This is a test deck', visibility='public')), content_type='application/json')
         assert response.status_code == 201
 
+    @patch('src.__init__.get_user_id_from_request', return_value=mockBadAuth)
+    async def test_create_deck_with_invalid_token(self):
+        '''Test the create deck route of our app with an invalid token'''
+        response = self.app.post('/deck/create', data=json.dumps(dict(localId='Test', title='TestDeck', description='This is a test deck', visibility='public')), content_type='application/json')
+        assert response.status_code == 403
+
+    @patch('src.__init__.get_user_id_from_request', return_value=mockNoAuth)
+    async def test_create_deck_with_no_token(self):
+        '''Test the create deck route of our app with an invalid token'''
+        response = self.app.post('/deck/create', data=json.dumps(dict(localId='Test', title='TestDeck', description='This is a test deck', visibility='public')), content_type='application/json')
+        assert response.status_code == 401
+
     @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
     async def test_update_deck_route_post(self):
         '''Test the deck/update route of our app with'''
@@ -90,6 +102,19 @@ class TestDeck(unittest.TestCase):
             self.app.post('/deck/create', data=json.dumps(dict(localId='Test', title='TestDeck', description='This is a test deck', visibility='public')), content_type='application/json')
             response = self.app.delete('/deck/delete/Test')
             assert response.status_code == 200
+
+    @patch('src.__init__.get_user_id_from_request', return_value=mockBadAuth)
+    async def test_delete_deck_with_invalid_token(self):
+        '''Test the deck/delete route of our app with an invalid token'''
+        response = self.app.delete('/deck/delete/Test')
+        assert response.status_code == 403
+
+    @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
+    @patch('src.__init__.user_owns_deck', return_value=mockUnauthorized)
+    async def test_delete_deck_unauthorized(self):
+        '''Test the deck/delete when unauthorized'''
+        response = self.app.delete('/deck/delete/Test')
+        assert response.status_code == 401
 
     @patch('src.__init__.get_user_id_from_request', return_value=mockGoodAuth)
     async def test_update_last_opened_deck_route_failure(self):
