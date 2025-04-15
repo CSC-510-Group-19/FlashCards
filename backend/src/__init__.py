@@ -56,6 +56,35 @@ def token_required(f):
   return decorated
 
 
+def user_owns_folder(uid, folder_id):
+  '''helper for has_folder_rights. returns json error message if error, otherwise True'''
+  try:
+    folder_snapshot = db.child("folder").child(folder_id).get().val()
+  except Exception as e:
+    return jsonify({'message': str(e)}), 500
+  if folder_snapshot is None:
+    return jsonify({"message": "Folder not found"}), 404
+  print("folder_snapshot", folder_snapshot)
+  if folder_snapshot.get('userId') != uid:
+    return jsonify({"message": "Unauthorized"}), 401
+
+  return True
+
+def user_owns_deck(uid, deck_id):
+  '''helper for has_deck_rights. returns json error message if error, otherwise True'''
+  try:
+    deck_snapshot = db.child("deck").child(deck_id).get().val()
+  except Exception as e:
+    return jsonify({'message': str(e)}), 500
+
+  if deck_snapshot is None:
+    return jsonify({"message": "Deck not found"}), 404
+  if deck_snapshot.get('userId') != uid:
+    return jsonify({"message": "Unauthorized"}), 401
+
+  return True
+
+
 def has_folder_rights(f):
   """this function is a decorator that checks if the authorization token in the header
   corresponds to the user id in the decorated function parameters. For this to work as intended
@@ -68,17 +97,25 @@ def has_folder_rights(f):
     if type(uid) is not str:
       return uid
 
-    folder_snapshot = db.child("folder").child(kwargs.get('folder_id', None)).get().val()
-
-    if folder_snapshot is None:
-      return jsonify({"message": "Folder not found"}), 404
-    print("folder_snapshot", folder_snapshot)
-    if folder_snapshot.get('userId') != uid:
-      return jsonify({"message": "Unauthorized"}), 401
-
-    return f(*args, **kwargs)
+    response = user_owns_folder(uid, kwargs.get('folder_id', None))
+    if response:
+      return f(*args, **kwargs)
+    else:
+      return response
 
   return decorated
+
+def deck_visible_helper(deck_id, uid):
+  '''Helper function for deck_is_visible'''
+
+  deck_snapshot = db.child("deck").child(deck_id).get().val()
+  if deck_snapshot is None:
+    return jsonify({"message": "Deck not found"}), 404
+  if deck_snapshot.get('userId') != uid:
+    if deck_snapshot.get('visibility') != 'public':
+      return jsonify({"message": "Unauthorized"}), 401
+
+  return True
 
 def deck_is_visible(f):
   """this function is a decorator that checks if a user can view a deck."""
@@ -89,11 +126,9 @@ def deck_is_visible(f):
     if type(uid) is not str:
       return uid
 
-    deck_snapshot = db.child("deck").child(kwargs.get('deck_id', None)).get().val()
-    if deck_snapshot is None:
-      return jsonify({"message": "Deck not found"}), 404
-    if deck_snapshot.get('userId') != uid:
-      return jsonify({"message": "Unauthorized"}), 401
+    response = deck_visible_helper(kwargs.get('deck_id', None), uid)
+    if not response:
+      return response
 
     return f(*args, **kwargs)
 
@@ -122,18 +157,13 @@ def has_folder_and_deck_rights(f):
       uid = get_user_id_from_request()
       data = request.get_json()
 
-      folder_snapshot = db.child("folder").child(data.get('folderId')).get().val()
+      folder_response = user_owns_folder(uid, data.get('folderId'))
+      if not folder_response:
+        return folder_response
 
-      if folder_snapshot is None:
-        return jsonify({"message": "Folder not found"}), 404
-      if folder_snapshot.get('userId') != uid:
-        return jsonify({"message": "Unauthorized"}), 401
-
-      deck_snapshot = db.child("deck").child(data.get('deckId')).get().val()
-      if deck_snapshot is None:
-        return jsonify({"message": "Deck not found"}), 404
-      if deck_snapshot.get('userId') != uid:
-        return jsonify({"message": "Unauthorized"}), 401
+      deck_response = user_owns_deck(uid, data.get('deckId'))
+      if not deck_response:
+        return deck_response
     else:
       return jsonify({'message': 'Method not allowed'}), 405
 
