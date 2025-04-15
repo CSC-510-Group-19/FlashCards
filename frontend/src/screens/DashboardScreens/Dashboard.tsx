@@ -1,4 +1,4 @@
-import { Card, Popconfirm, Button, Modal } from "antd";
+import { Card, Popconfirm, Button, Modal, Input } from "antd";
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import EmptyImg from "assets/images/empty.svg";
@@ -50,6 +50,11 @@ const Dashboard = () => {
   // for streaks
   const [streak, setStreak] = useState(10);
   const isActive = streak > 0; // Streak is active if it's greater than 0
+
+  // for folder rename
+  const [newFolderName, setNewFolderName] = useState("");
+  const [isFolderRenameVisible, setIsFolderRenameVisible] = useState(false);
+  const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
 
   // for progress tracking
   const [progress, setProgress] = useState(0);
@@ -233,6 +238,29 @@ const Dashboard = () => {
     }
   };
 
+  const handleRenameFolder = async () => {
+    if (!newFolderName.trim() || !selectedFolder) {
+      Swal.fire("Folder name cannot be empty or no folder selected!", "", "error");
+      return;
+    }
+  
+      try {
+        await http.patch(`/folder/update/${selectedFolder.id}`, { 
+          name: newFolderName, 
+          headers: {
+            'Authorization': `${idToken}`
+          }
+        });
+        Swal.fire("Folder Renamed Successfully!", "", "success");
+        setIsFolderRenameVisible(false);
+        setNewFolderName("");
+        setSelectedFolder(null);
+        fetchFolders(); 
+      } catch (err) {
+        Swal.fire("Failed to rename folder!", "", "error");
+      }
+    };
+
   // Update arrows visibility based on scroll position
   const updateArrowsVisibilityLibrary = () => {
     if (sliderRefLibrary.current) {
@@ -321,7 +349,16 @@ const Dashboard = () => {
                             <i className="lni lni-trash-can"></i> Delete
                           </button>
                         </Popconfirm>
+                        <button className="btn btn-main" onClick={() => {
+                        setSelectedFolder(folder);  
+                        setNewFolderName(folder.name);  
+                        setIsFolderRenameVisible(true);  
+                      }}>
+                        <i className="lni lni-folder mr-2"></i>
+                        <span>Rename Folder</span>
+                      </button>
                       </div>
+                      
                     </div>
                 </div>
               ))
@@ -474,6 +511,20 @@ const Dashboard = () => {
                 </div>
               ))
             )}
+          </Modal>
+
+          {/* Rename Folder Modal */}
+          <Modal
+            title="Rename Folder"
+            open={isFolderRenameVisible}
+            onOk={handleRenameFolder}
+            onCancel={() => setIsFolderRenameVisible(false)}
+          >
+            <Input
+              value={newFolderName}
+              onChange={(e) => setNewFolderName(e.target.value)}
+              placeholder="Enter folder name"
+            />
           </Modal>
         </div>
       </section>
