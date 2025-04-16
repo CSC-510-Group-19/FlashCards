@@ -19,8 +19,6 @@ export default function Flashcard({cards}: any) {
   const [activeGoal, setActiveGoal] = useState("");
   const idToken = window.localStorage.getItem('idToken');
 
-  const idToken = window.localStorage.getItem('idToken')
-
   useEffect(() => {
 
     const fetchGoal = async () => {
