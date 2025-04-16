@@ -17,6 +17,7 @@ export default function Flashcard({cards}: any) {
   const { id } = useParams();
   const [studyTime, setStudyTime] = useState(0);
   const [activeGoal, setActiveGoal] = useState("");
+  const idToken = window.localStorage.getItem('idToken');
 
   const idToken = window.localStorage.getItem('idToken')
 

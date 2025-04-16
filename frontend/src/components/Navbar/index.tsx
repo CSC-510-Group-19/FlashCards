@@ -14,6 +14,8 @@ const Navbar = ({ isDashboard, onFolderCreated }: NavbarProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const flashCardUser = window.localStorage.getItem("flashCardUser");
+  const idToken = window.localStorage.getItem('idToken');
+
   const { localId } = (flashCardUser && JSON.parse(flashCardUser)) || {};
 
   const handleLogout = () => {
@@ -28,7 +30,11 @@ const Navbar = ({ isDashboard, onFolderCreated }: NavbarProps) => {
     }
 
     try {
-      await http.post("/folder/create", { name: newFolderName, userId: localId});
+      await http.post("/folder/create", { name: newFolderName, userId: localId}, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      });
       Swal.fire("Folder Created Successfully!", "", "success");
       setIsModalVisible(false);
       setNewFolderName("");

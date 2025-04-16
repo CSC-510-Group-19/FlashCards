@@ -35,6 +35,7 @@ const CreateDeck = () => {
 
   const flashCardUser = window.localStorage.getItem('flashCardUser');
   const { localId } = flashCardUser && JSON.parse(flashCardUser) || {};
+  const idToken = window.localStorage.getItem('idToken');
 
   const handleCreateDeck = async(e: any) => {
     e.preventDefault();
@@ -47,7 +48,11 @@ const CreateDeck = () => {
     setIsSubmitting(true);
 
     await http
-      .post("/deck/create", payload)
+      .post("/deck/create", payload, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      })
       .then((res) => {
         const { id } = res.data;
         Swal.fire({

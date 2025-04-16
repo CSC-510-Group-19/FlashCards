@@ -53,6 +53,7 @@ const StudyHabits = () => {
   const [canScrollRightRec, setCanScrollRightRec] = useState(false);
 
   const flashCardUser = window.localStorage.getItem("flashCardUser");
+  const idToken = window.localStorage.getItem("idToken");
   const { localId } = (flashCardUser && JSON.parse(flashCardUser)) || {};
 
   const navigate = useNavigate();
@@ -89,7 +90,11 @@ const StudyHabits = () => {
       const updatedGoals: Record<string, { goal: string; completed: boolean; progress: number; target: number; }> = {};
       await Promise.all(_decks.map(async (deck: Deck) => {
         try {
-          const goalRes = await http.get(`/deck/goal/${deck.id}`);
+          const goalRes = await http.get(`/deck/goal/${deck.id}`, {
+        headers: {
+          'Authorization': `${idToken}`
+        }
+      });
           updatedGoals[deck.id] = {
             goal: goalRes.data.goal,
             completed: goalRes.data.goalCompleted,
